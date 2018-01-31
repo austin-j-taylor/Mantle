@@ -26,16 +26,18 @@ public enum Direction : short {
 public class PlayerMovementController : MonoBehaviour {
 
     public Animator animator;
-    public float speed = 1f;
+    private float speed = 3f;
 
     private Direction movingDirection = Direction.None;
     private Camera rotationController;
+    private Rigidbody rb;
 
     private static GameObject thePlayer;
 
     private void Start() {
         rotationController = Camera.main;
         thePlayer = gameObject;
+        rb = GetComponent<Rigidbody>();
     }
 
     void FixedUpdate() {
@@ -82,10 +84,11 @@ public class PlayerMovementController : MonoBehaviour {
             animator.SetBool("IsJustWalking", false);
             movingDirection = Direction.None;
         }
-
+        
         movement = movement.normalized * speed * Time.deltaTime;
-        GetComponent<Rigidbody>().MovePosition(transform.position + transform.TransformDirection(movement));
+        rb.MovePosition(transform.position + transform.TransformDirection(movement));
 
+        Debug.Log("rot " + rotationController.transform.rotation.eulerAngles.y);
         transform.rotation = Quaternion.Euler(new Vector3(0f, rotationController.transform.rotation.eulerAngles.y, 0f));
     }
 

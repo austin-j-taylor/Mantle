@@ -15,40 +15,52 @@ public class CameraController : MonoBehaviour {
     private float moveSmoothing = .05f;
     private int directionOffsetDistance = 10;
     private int degreesRotation = 120;
-    
 
-    void Start () {
+
+    void Start() {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovementController>();
         positionOffset = new Vector3(0, 13, -22);
         squareRootDOD = Mathf.Sqrt(directionOffsetDistance);
         targetTransform = new GameObject();
         currentOffset = new Vector3();
-	}
+    }
 
     private void LateUpdate() {
-        Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
+        //Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
+
+        //currentOffset = Vector3.Lerp(currentOffset, player.transform.rotation * offset, moveSmoothing);
+        //transform.LookAt(player.transform.position + currentOffset);
+    }
+
+    void Update() {
+        //Vector3 positionBeforeRotation = targetTransform.transform.position;
+
+        //int rotate = 0;
+        //if (Input.GetKey(KeyCode.Q)) {
+        //    rotate = -degreesRotation;
+        //} else if (Input.GetKey(KeyCode.E)) {
+        //    rotate = degreesRotation;
+        //}
+
+        //targetTransform.transform.RotateAround(PlayerMovementController.GetPlayerPosition(), Vector3.up, rotate * Time.deltaTime);
+        //Vector3 deltaRotation = targetTransform.transform.position - positionBeforeRotation;
+        //rotationOffset = rotationOffset + deltaRotation;
+
+
+        /* currentOffset is applied to position instead of rotation in FixedUpdate until Unity resolves its Japes */
         
+        Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
         currentOffset = Vector3.Lerp(currentOffset, player.transform.rotation * offset, moveSmoothing);
-        transform.LookAt(player.transform.position + currentOffset);
-    }
+        
+        /**/
 
-    void Update () {
-        Vector3 positionBeforeRotation = targetTransform.transform.position;
-
-        int rotate = 0;
-        if (Input.GetKey(KeyCode.Q)) {
-            rotate = -degreesRotation;
-        } else if (Input.GetKey(KeyCode.E)) {
-            rotate = degreesRotation;
-        }
-
-        targetTransform.transform.RotateAround(player.transform.position, Vector3.up, rotate * Time.deltaTime);
-        Vector3 deltaRotation = targetTransform.transform.position - positionBeforeRotation;
-        rotationOffset = rotationOffset + deltaRotation;
-
-        targetTransform.transform.position = player.transform.position + positionOffset + rotationOffset;// + offset; // uncomment for fun times
+        targetTransform.transform.position = PlayerMovementController.GetPlayerPosition() + positionOffset + rotationOffset + currentOffset;// + offset; // uncomment for fun times
         transform.position = Vector3.Lerp(transform.position, targetTransform.transform.position, turnSmoothing * Time.deltaTime);
+
+        
+
     }
+
     Vector3 FollowMovement() {
         Direction facingDirection = player.GetMovingDirection();
         Vector3 directionOffset;
