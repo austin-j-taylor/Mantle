@@ -88,7 +88,6 @@ public class PlayerMovementController : MonoBehaviour {
         movement = movement.normalized * speed * Time.deltaTime;
         rb.MovePosition(transform.position + transform.TransformDirection(movement));
 
-        Debug.Log("rot " + rotationController.transform.rotation.eulerAngles.y);
         transform.rotation = Quaternion.Euler(new Vector3(0f, rotationController.transform.rotation.eulerAngles.y, 0f));
     }
 

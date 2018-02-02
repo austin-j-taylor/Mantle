@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour {
-    
-    private Vector3 hitPositionOffset;
+
     private Transform hit;
     private bool stuck = false;
     private bool stuckLastFrame = true;

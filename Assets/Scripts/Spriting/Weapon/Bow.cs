@@ -3,12 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Bow : Shooter {
-    
-	void Start () {
-		
-	}
-	
-	void Update () {
-		
-	}
+
+    private float drawingTime;
+
+    private void Start() {
+        velocity = 20;
+        loadTime = 1f;
+        launchPosition = new Vector3(0f, 0f, .5f);
+        SetVelocityShortcuts();
+    }
+
+    protected override IEnumerator Loading() {
+        if (!nocked) {
+            Nock();
+        }
+        IsLoading = true;
+
+        drawingTime = Time.time;
+        yield return new WaitForSeconds(loadTime);
+
+        IsLoading = false;
+        Loaded = true;
+    }
+
+    public float DrawingTime {
+        get { return Time.time - drawingTime; }
+    }
+
 }
