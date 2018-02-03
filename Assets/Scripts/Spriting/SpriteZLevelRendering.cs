@@ -13,7 +13,7 @@ public class SpriteZLevelRendering : MonoBehaviour {
     public int[] relativeLayers;
 
     private const int IsometricRangePerZUnit = 10;
-    private const int LayerDifferenceConstant = 50;
+    private const int LayerDifferenceConstant = 100;
     
     private SpriteRenderer[] spriteChildren;
     private Transform movingObject;

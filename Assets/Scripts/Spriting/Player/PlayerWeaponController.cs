@@ -8,6 +8,7 @@ public class PlayerWeaponController : MonoBehaviour {
 
     private LayerMask ignorePlayerLayer;
     private float maxRange = 100f;
+    private bool funMode = false;
 
     void Start() {
         ignorePlayerLayer = ~(1 << LayerMask.NameToLayer("Player"));
@@ -31,6 +32,15 @@ public class PlayerWeaponController : MonoBehaviour {
     }
 
     private void BowUpdate(RaycastHit hit) {
+        if(Input.GetKeyDown(KeyCode.F)) {
+            funMode = !funMode;
+        }
+        if(funMode && Input.GetButton("Fire1")) {
+            // fun mode
+            Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, !Input.GetButton("Fire3"));
+            bow.Fire(launchVelocity);
+        }
+
         if (bow.Loaded) { // is already loaded
             // if right click, lower bow, keeping arrow nocked
             if (Input.GetButtonDown("Fire2")) {
