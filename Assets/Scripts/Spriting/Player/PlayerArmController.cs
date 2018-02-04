@@ -7,6 +7,7 @@ public class PlayerArmController : MonoBehaviour {
     public GameObject leftArm;
     public GameObject rightArm;
 
+    private PlayerWeaponController player;
     private SpriteZLevelRendering zRenderer;
 
     // Default layer values
@@ -19,6 +20,7 @@ public class PlayerArmController : MonoBehaviour {
     private const int right = 2;
 
     void Start() {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerWeaponController>();
         zRenderer = gameObject.GetComponent<SpriteZLevelRendering>();
     }
 
@@ -56,6 +58,10 @@ public class PlayerArmController : MonoBehaviour {
 
     private void SetRightHandFront() {
         zRenderer.relativeLayers[right] = frontRight;
+    }
+
+    private void PullArrowFromQuiver() {
+        player.PullArrowFromQuiver();
     }
 
 }

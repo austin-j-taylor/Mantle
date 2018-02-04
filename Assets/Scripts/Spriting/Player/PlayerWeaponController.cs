@@ -5,13 +5,19 @@ using UnityEngine;
 public class PlayerWeaponController : MonoBehaviour {
 
     public Bow bow;
+    public GameObject quiver;
+    public Transform projectileAnchor;
 
+    private Projectile currentlyHeldProjectile;
+
+    private Animator anim;
     private LayerMask ignorePlayerLayer;
     private float maxRange = 100f;
     private bool funMode = false;
 
     void Start() {
         ignorePlayerLayer = ~(1 << LayerMask.NameToLayer("Player"));
+        anim = GetComponentInChildren<Animator>();
     }
 
     void Update() {
@@ -21,7 +27,6 @@ public class PlayerWeaponController : MonoBehaviour {
         // goes from CAMERA towards SCREEN which likely WILL INTERSECT WITH THE PHYSICAL REALM
         RaycastHit hit;
         if (Physics.Raycast(camRay, out hit, maxRange, ignorePlayerLayer)) { // target point selected, should always be true
-            // shooter.PredictPath(launchVelocity, hit.point);
 
             // if using bow
             BowUpdate(hit);
@@ -32,13 +37,15 @@ public class PlayerWeaponController : MonoBehaviour {
     }
 
     private void BowUpdate(RaycastHit hit) {
-        if(Input.GetKeyDown(KeyCode.F)) {
+
+        Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, !Input.GetButton("Fire3"));
+
+        if (Input.GetKeyDown(KeyCode.F)) {
             funMode = !funMode;
         }
         if(funMode && Input.GetButton("Fire1")) {
             // fun mode
-            Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, !Input.GetButton("Fire3"));
-            bow.Fire(launchVelocity);
+            bow.Fire(launchVelocity, currentlyHeldProjectile);
         }
 
         if (bow.Loaded) { // is already loaded
@@ -49,8 +56,8 @@ public class PlayerWeaponController : MonoBehaviour {
 
             // if not holding left click, fire
             if (!Input.GetButton("Fire1")) {
-                Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, !Input.GetButton("Fire3"));
-                bow.Fire(launchVelocity);
+                anim.SetTrigger("Fire");
+                bow.Fire(launchVelocity, currentlyHeldProjectile);
             }
         } else
             if (bow.IsLoading) { // is currently loading
@@ -62,25 +69,32 @@ public class PlayerWeaponController : MonoBehaviour {
             // if release click, fire before full draw for less launch velocty
             if (!Input.GetButton("Fire1")) {
                 bow.CeaseLoad();
-                // TODO make me littler
-                Vector3 launchVelocity = (bow.DrawingTime / bow.LoadTime) *  bow.CalculateLaunchVelocity(hit.point, !Input.GetButton("Fire3"));
-                bow.Fire(launchVelocity);
+                // make me littler launch velocity
+                anim.SetTrigger("Fire");
+                bow.Fire((bow.DrawingTime / bow.LoadTime) * launchVelocity, currentlyHeldProjectile);
             }
 
         } else { // not loaded, is not alreading loading
                  // if left click, begin loading bow
             if (Input.GetButtonDown("Fire1")) {
+
                 bow.Load();
             } else
             // if not trying to load same frame, just draw arrow from quiver and nock arrow (or replace arrow into quiver)
             if (Input.GetButtonDown("Fire2")) {
                 if (bow.Nocked) {
+                    anim.SetTrigger("Unnock");
                     bow.Unnock();
                 } else {
+                    anim.SetTrigger("Nock");
                     bow.Nock();
                 }
             }
 
         }
+    }
+    public void PullArrowFromQuiver() {
+        currentlyHeldProjectile = bow.SpawnProjectile(quiver.transform.position + new Vector3(.07f, 0, 0), quiver.transform.localRotation * Quaternion.Euler(180, 90, 0));
+        currentlyHeldProjectile.transform.SetParent(projectileAnchor, true);
     }
 }

@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour {
 
+    public bool inHand = true;
+    public bool InHand {
+        get { return inHand; }
+        set { inHand = value; }
+    }
+
     private Transform hit;
     private bool stuck = false;
     private bool stuckLastFrame = true;
@@ -21,7 +27,7 @@ public class Projectile : MonoBehaviour {
                 stuckLastFrame = false;
             }
 
-        } else {
+        } else if(!inHand) {
             // make rotation equal velocity
             transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
             lastRotation = transform.rotation;

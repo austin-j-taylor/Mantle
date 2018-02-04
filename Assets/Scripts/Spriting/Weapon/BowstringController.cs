@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class BowstringController : MonoBehaviour {
 
+    public Transform nockPosition;
     public Transform nock;
+    public Transform topLimb;
+    public Transform bottomLimb;
     public Transform topCam;
     public Transform bottomCam;
     public Transform topCableAnchor;
@@ -17,9 +20,16 @@ public class BowstringController : MonoBehaviour {
     private LineRenderer bowstring;
     private LineRenderer topCable;
     private LineRenderer bottomCable;
-    
-    void Start () {
-    
+
+    //private const int largeUpperAngle = 349;
+    //private const int largeLowerAngle = 113;
+    private const int outerUpperAngle = 348;
+    private const int outerLowerAngle = 112;
+    private const int innerUpperAngle = 270;
+    private const int innerLowerAngle = 165;
+
+    void Start() {
+
         bowstring = GetComponent<LineRenderer>();
         topCable = topPivot.GetComponent<LineRenderer>();
         bottomCable = bottomPivot.GetComponent<LineRenderer>();
@@ -29,13 +39,64 @@ public class BowstringController : MonoBehaviour {
 
         topPivot.position = topCam.position;
         bottomPivot.position = bottomCam.position;
-        
-        nock.position = (topStringAnchor.position + bottomStringAnchor.position) / 2;
+
+        nockPosition.position = (topStringAnchor.position + bottomStringAnchor.position) / 2;
 
     }
-	
-	void Update () {
-        // update positions
+
+    public float stringAngularRotation;
+    public float cableAngularRotation;
+
+    void Update() {
+        // cam rotation magic
+        float drawDistance = nock.localPosition.x;
+
+        topCam.localRotation = Quaternion.Euler(0, 0, -drawDistance * 450);
+        bottomCam.localRotation = Quaternion.Euler(0, 0, drawDistance * 450);
+
+        topLimb.localRotation = Quaternion.Euler(0, 0, -drawDistance * 15);
+        bottomLimb.localRotation = Quaternion.Euler(0, 0, drawDistance * 15);
+
+        Vector3 camOuterLargeRadius = new Vector3(.05f, 0, 0);
+        Vector3 camOuterSmallRadius = new Vector3(.025f, 0, 0);
+
+        Vector3 camInnerLargeRadius = new Vector3(.027f, 0, 0);
+        Vector3 camInnerSmallRadius = new Vector3(.0125f, 0, 0);
+
+        // setting string angular positions
+
+        stringAngularRotation = -drawDistance * 570;
+
+        stringAngularRotation %= 360;
+        if (stringAngularRotation < 0) {
+            stringAngularRotation += 360;
+        }
+
+        if (stringAngularRotation > outerLowerAngle && stringAngularRotation < outerUpperAngle) {
+            topStringAnchor.localPosition = Quaternion.AngleAxis(stringAngularRotation, transform.forward) * camOuterLargeRadius;
+            bottomStringAnchor.localPosition = Quaternion.AngleAxis(-stringAngularRotation, transform.forward) * camOuterLargeRadius;
+        } else {
+            topStringAnchor.localPosition = Quaternion.AngleAxis(stringAngularRotation, transform.forward) * camOuterSmallRadius + new Vector3(.0375f, -.0375f, 0);
+            bottomStringAnchor.localPosition = Quaternion.AngleAxis(-stringAngularRotation, transform.forward) * camOuterSmallRadius + new Vector3(.0375f, .0375f, 0);
+        }
+
+        cableAngularRotation = -drawDistance * 500 + 180;
+
+        cableAngularRotation %= 360;
+        if (cableAngularRotation < 0) {
+            cableAngularRotation += 360;
+        }
+
+        if (!(cableAngularRotation > innerLowerAngle && cableAngularRotation < innerUpperAngle)) {
+            topCableAnchor.localPosition = Quaternion.AngleAxis(cableAngularRotation, transform.forward) * camInnerLargeRadius;
+            bottomCableAnchor.localPosition = Quaternion.AngleAxis(-cableAngularRotation, transform.forward) * camInnerLargeRadius;
+        } else {
+            topCableAnchor.localPosition = Quaternion.AngleAxis(cableAngularRotation, transform.forward) * camInnerSmallRadius + new Vector3(-.01875f, .01875f, 0);
+            bottomCableAnchor.localPosition = Quaternion.AngleAxis(-cableAngularRotation, transform.forward) * camInnerSmallRadius + new Vector3(-.01875f, -.01875f, 0);
+        }
+
+
+        // update line positions
         bowstring.SetPosition(0, transform.InverseTransformPoint(topStringAnchor.position));
         bowstring.SetPosition(2, transform.InverseTransformPoint(bottomStringAnchor.position));
         bowstring.SetPosition(1, transform.InverseTransformPoint(nock.position));
@@ -43,11 +104,6 @@ public class BowstringController : MonoBehaviour {
         topCable.SetPosition(1, topPivot.InverseTransformPoint(bottomCableAnchor.position));
         bottomCable.SetPosition(1, bottomPivot.InverseTransformPoint(topCableAnchor.position));
 
-        // cam rotation magic
-        float drawDistance = (nock.position.x - 1.05f) * 270;
-
-        topCam.rotation = Quaternion.Euler(0, 0, -drawDistance);
-        bottomCam.rotation = Quaternion.Euler(0, 0, drawDistance);
 
 
     }

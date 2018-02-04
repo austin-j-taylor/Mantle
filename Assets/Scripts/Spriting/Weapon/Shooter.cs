@@ -6,16 +6,18 @@ public class Shooter : MonoBehaviour {
 
     public Projectile projectile;
 
+    protected Animator shooterAnimator;
+
     protected float velocity = 15;
     protected float loadTime = 1f;
+    protected bool nocked = false;
+    protected bool isLoading = false;
+    protected bool loaded = false;
     protected Vector3 launchPosition; // position on the weapon at which the shot appears
 
     private LineRenderer predictedPath;
     private Vector3 shotSpawn;
     private Coroutine loadingRoutine;
-    public bool nocked = false;
-    public bool isLoading = false;
-    public bool loaded = false;
 
     // constants for physics calculations
     private float velocity2;
@@ -39,6 +41,7 @@ public class Shooter : MonoBehaviour {
 
     void Start() {
         predictedPath = GetComponent<LineRenderer>();
+        shooterAnimator = GetComponent<Animator>();
         launchPosition = new Vector3(0f, 0f, .5f);
         SetVelocityShortcuts();
     }
@@ -74,25 +77,42 @@ public class Shooter : MonoBehaviour {
               / (gravity * distance));
 
         Vector3 trueVelocityDirection = new Vector3(horizontalComponentDirection.x * Mathf.Cos(radiansUp), Mathf.Sin(radiansUp), horizontalComponentDirection.z * Mathf.Cos(radiansUp));
-        
+
         Vector3 trueVelocity = trueVelocityDirection * velocity;
-        
-        //transform.rotation = Quaternion.LookRotation(trueVelocity);
+
+        RotateToLaunch(radiansUp * 180 / Mathf.PI);
 
         return trueVelocity;
 
     }
 
-    public void Fire(Vector3 launchVelocity) {
+    public Projectile SpawnProjectile(Vector3 spawnPosition, Quaternion spawnRotation) {
+        Projectile newProjectile = Instantiate(projectile, spawnPosition, spawnRotation);
+        newProjectile.GetComponent<Collider>().enabled = false;
+        newProjectile.GetComponent<Rigidbody>().isKinematic = true;
+        newProjectile.InHand = true;
+        return newProjectile;
+    }
+
+    public void Fire(Vector3 launchVelocity, Projectile shot) {
+
+        shot.transform.parent = null;
+        shot.GetComponent<Collider>().enabled = true;
+        shot.GetComponent<Rigidbody>().isKinematic = false;
+
+        shooterAnimator.SetTrigger("Fire");
+        shooterAnimator.SetBool("Loaded", false);
         nocked = false;
         loaded = false;
+        shot.InHand = false;
 
-        Projectile shot = Instantiate(projectile, shotSpawn, Quaternion.LookRotation(launchVelocity));
+        //Projectile shot = Instantiate(projectile, shotSpawn, Quaternion.LookRotation(launchVelocity));
 
         shot.GetComponent<Rigidbody>().velocity = launchVelocity;
     }
 
     public void Load() {
+        shooterAnimator.ResetTrigger("Fire");
         loadingRoutine = StartCoroutine(Loading());
     }
 
@@ -101,15 +121,19 @@ public class Shooter : MonoBehaviour {
             Nock();
         }
         isLoading = true;
+        shooterAnimator.SetBool("IsLoading", true);
 
         yield return new WaitForSeconds(loadTime);
 
+        shooterAnimator.SetBool("IsLoading", false);
+        shooterAnimator.SetBool("Loaded", true);
         isLoading = false;
         loaded = true;
     }
 
     public virtual void CeaseLoad() {
         isLoading = false;
+        shooterAnimator.SetBool("IsLoading", false);
         StopCoroutine(loadingRoutine);
     }
 
@@ -123,25 +147,18 @@ public class Shooter : MonoBehaviour {
 
     public void Undraw() {
         loaded = false;
+        shooterAnimator.SetBool("Loaded", false);
+        shooterAnimator.SetBool("IsLoading", false);
+        shooterAnimator.SetTrigger("Undraw");
+    }
+
+    public void RotateToLaunch(float angle) {
+        transform.localRotation = Quaternion.Lerp(transform.localRotation, Quaternion.Euler(-angle, 90, 0), 10 * Time.deltaTime);
     }
 
     /*
      * Visually predicts the path the projectile would take if it launched with the current velocity
      */
-    //public void PredictPath(Vector3 targetPos) {
-    //    int firstIndex = 0;
-    //    int lastIndex = 1;
-
-    //    predictedPath.enabled = true;
-
-    //    predictedPath.SetPosition(firstIndex, shotSpawn);
-
-
-
-    //    predictedPath.SetPosition(lastIndex, targetPos);
-
-    //}
-
     public void PredictPath(Vector3 launchVelocity, Vector3 targetPos) {
 
         int segmentCount = 40;
