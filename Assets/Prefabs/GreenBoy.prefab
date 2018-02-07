@@ -38,7 +38,6 @@ GameObject:
   - component: {fileID: 4853954585718632}
   - component: {fileID: 95412395541445472}
   - component: {fileID: 114784400311540280}
-  - component: {fileID: 114296692155965440}
   m_Layer: 10
   m_Name: PlayerRig
   m_TagString: Untagged
@@ -266,7 +265,7 @@ Animator:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1480348245378638}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 5f633d1937094a545abf09f92b09bd52, type: 2}
   m_CullingMode: 0
@@ -276,19 +275,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114296692155965440
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1480348245378638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bf55d40fe8450c4f94c69efc9a3452f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  leftArm: {fileID: 1884265108237956}
-  rightArm: {fileID: 1674959601955642}
 --- !u!114 &114784400311540280
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -300,7 +286,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a9fd481ada458144a5c7e721076e37f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  relativeLayers: 
+  relativeSpriteLayers: 
+  relativeLineRendererLayers: 
+  spriteChildren: []
+  lineRendererChildren: []
 --- !u!212 &212089483992866696
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -26,29 +26,29 @@ public class CameraController : MonoBehaviour {
     }
 
     private void LateUpdate() {
-        //Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
+        Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
 
-        //currentOffset = Vector3.Lerp(currentOffset, player.transform.rotation * offset, moveSmoothing);
+        currentOffset = Vector3.Lerp(currentOffset, player.transform.rotation * offset, moveSmoothing);
         //transform.LookAt(player.transform.position + currentOffset);
     }
 
     void Update() {
-        //Vector3 positionBeforeRotation = targetTransform.transform.position;
+        Vector3 positionBeforeRotation = targetTransform.transform.position;
 
-        //int rotate = 0;
+        int rotate = 0;
         //if (Input.GetKey(KeyCode.Q)) {
         //    rotate = -degreesRotation;
         //} else if (Input.GetKey(KeyCode.E)) {
         //    rotate = degreesRotation;
         //}
 
-        //targetTransform.transform.RotateAround(PlayerMovementController.GetPlayerPosition(), Vector3.up, rotate * Time.deltaTime);
-        //Vector3 deltaRotation = targetTransform.transform.position - positionBeforeRotation;
-        //rotationOffset = rotationOffset + deltaRotation;
+        targetTransform.transform.RotateAround(PlayerMovementController.GetPlayerPosition(), Vector3.up, rotate * Time.deltaTime);
+        Vector3 deltaRotation = targetTransform.transform.position - positionBeforeRotation;
+        rotationOffset = rotationOffset + deltaRotation;
 
 
         /* currentOffset is applied to position instead of rotation in FixedUpdate until Unity resolves its Japes */
-        
+
         Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
         currentOffset = Vector3.Lerp(currentOffset, player.transform.rotation * offset, moveSmoothing);
         
@@ -103,7 +103,7 @@ public class CameraController : MonoBehaviour {
         mousePosition.x -= Screen.width / 2;
         mousePosition.y -= Screen.height / 2;
 
-        Vector3 normalizedMousePosition = new Vector3(mousePosition.x / Screen.width, mousePosition.y / Screen.height);// = mousePosition / Mathf.Sqrt(Screen.width * Screen.width + Screen.height * Screen.height);
+        Vector3 normalizedMousePosition = new Vector3(mousePosition.x / Screen.width, mousePosition.y / Screen.height);
         Vector3 directionOffset = directionOffsetDistance * new Vector3(normalizedMousePosition.x, 0, normalizedMousePosition.y);
 
         return directionOffset;

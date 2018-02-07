@@ -18,9 +18,10 @@ public class PlayerWeaponController : MonoBehaviour {
     void Start() {
         ignorePlayerLayer = ~(1 << LayerMask.NameToLayer("Player"));
         anim = GetComponentInChildren<Animator>();
+        currentlyHeldProjectile = null;
     }
 
-    void Update() {
+    void LateUpdate() {
 
         Ray camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -38,31 +39,39 @@ public class PlayerWeaponController : MonoBehaviour {
 
     private void BowUpdate(RaycastHit hit) {
 
-        Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, !Input.GetButton("Fire3"));
+        Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, (currentlyHeldProjectile == null) ? bow.transform.position : currentlyHeldProjectile.transform.position, !Input.GetButton("Fire3"));
 
         if (Input.GetKeyDown(KeyCode.F)) {
             funMode = !funMode;
         }
-        if(funMode && Input.GetButton("Fire1")) {
+        if (funMode && Input.GetButton("Fire1")) {
             // fun mode
+            PullArrowFromQuiver();
             bow.Fire(launchVelocity, currentlyHeldProjectile);
+            currentlyHeldProjectile = null;
         }
 
         if (bow.Loaded) { // is already loaded
             // if right click, lower bow, keeping arrow nocked
             if (Input.GetButtonDown("Fire2")) {
+                anim.SetBool("IsDrawing", false);
+                anim.SetTrigger("Unnock");
                 bow.Undraw();
             } else
 
             // if not holding left click, fire
             if (!Input.GetButton("Fire1")) {
+                anim.SetBool("IsDrawing", false);
                 anim.SetTrigger("Fire");
                 bow.Fire(launchVelocity, currentlyHeldProjectile);
+                currentlyHeldProjectile = null;
             }
         } else
             if (bow.IsLoading) { // is currently loading
                                  // if right click, carefully release draw, keeping arrow nocked
             if (Input.GetButtonDown("Fire2")) {
+                anim.SetBool("IsDrawing", false);
+                anim.SetTrigger("Unnock");
                 bow.CeaseLoad();
                 bow.Undraw();
             } else
@@ -70,31 +79,52 @@ public class PlayerWeaponController : MonoBehaviour {
             if (!Input.GetButton("Fire1")) {
                 bow.CeaseLoad();
                 // make me littler launch velocity
+                anim.SetBool("IsDrawing", false);
                 anim.SetTrigger("Fire");
                 bow.Fire((bow.DrawingTime / bow.LoadTime) * launchVelocity, currentlyHeldProjectile);
+                currentlyHeldProjectile = null;
             }
 
         } else { // not loaded, is not alreading loading
-                 // if left click, begin loading bow
-            if (Input.GetButtonDown("Fire1")) {
-
-                bow.Load();
-            } else
-            // if not trying to load same frame, just draw arrow from quiver and nock arrow (or replace arrow into quiver)
-            if (Input.GetButtonDown("Fire2")) {
-                if (bow.Nocked) {
+                 // if nocked and left click, begin loading bow
+            if (bow.Nocked) {
+                if (Input.GetButtonDown("Fire2")) {
+                    // replace arrow into quiver
                     anim.SetTrigger("Unnock");
-                    bow.Unnock();
-                } else {
+                    SetArrowNotNockedOnBowstring();
+                } else
+                if (Input.GetButtonDown("Fire1")) {
+                    anim.SetBool("IsDrawing", true);
+                    bow.Load();
+                }
+            } else { // not nocked
+                if (Input.GetButtonDown("Fire2") || Input.GetButtonDown("Fire1")) {
+                    // draw arrow from quiver and nock arrow
                     anim.SetTrigger("Nock");
-                    bow.Nock();
                 }
             }
 
         }
     }
+
     public void PullArrowFromQuiver() {
         currentlyHeldProjectile = bow.SpawnProjectile(quiver.transform.position + new Vector3(.07f, 0, 0), quiver.transform.localRotation * Quaternion.Euler(180, 90, 0));
         currentlyHeldProjectile.transform.SetParent(projectileAnchor, true);
+    }
+
+    public void ReplaceArrowIntoQuiver() {
+        Destroy(currentlyHeldProjectile.gameObject);
+    }
+
+    public void SetArrowNockedOnBowstring() {
+        bow.Nocked = true;
+        currentlyHeldProjectile.transform.SetParent(bow.nockPosition);
+        currentlyHeldProjectile.SetTailPositionNocked();
+    }
+
+    private void SetArrowNotNockedOnBowstring() {
+        bow.Nocked = false;
+        currentlyHeldProjectile.transform.SetParent(projectileAnchor, true);
+        //currentlyHeldProjectile.SetTailPositionNotNocked();
     }
 }

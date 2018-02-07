@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour {
 
-    public bool inHand = true;
+    private bool inHand = true;
     public bool InHand {
         get { return inHand; }
         set { inHand = value; }
     }
+
+    protected Vector3 nockedPositionOffset;
 
     private Transform hit;
     private bool stuck = false;
@@ -17,7 +19,11 @@ public class Projectile : MonoBehaviour {
     private Quaternion lastRotation;
     private Vector3 lastPosition;
     private Vector3 lastSpeed;
-    
+
+    private void Start() {
+        nockedPositionOffset = Vector3.zero;
+    }
+
     void LateUpdate() {
         if (stuck) {
             if(stuckLastFrame) {
@@ -27,7 +33,12 @@ public class Projectile : MonoBehaviour {
                 stuckLastFrame = false;
             }
 
-        } else if(!inHand) {
+        } else if(inHand) {
+            // make tail of arrow appear at the bow's nock position
+
+            // make head of arrow angle towards the bow's riser nock position
+
+        } else {
             // make rotation equal velocity
             transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
             lastRotation = transform.rotation;
@@ -53,4 +64,9 @@ public class Projectile : MonoBehaviour {
         transform.parent = scaleUnMesserUpper.transform;
 
     }
+    public void SetTailPositionNocked() {
+        transform.localPosition = nockedPositionOffset;
+        transform.localRotation = Quaternion.Euler(0, -90, 0);
+    }
+
 }

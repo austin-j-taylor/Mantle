@@ -5,6 +5,7 @@ using UnityEngine;
 public class Shooter : MonoBehaviour {
 
     public Projectile projectile;
+    public Transform nockPosition;
 
     protected Animator shooterAnimator;
 
@@ -55,10 +56,11 @@ public class Shooter : MonoBehaviour {
      * Fires this Shooter's Projectile from launchPosition such that it will pass through targetPoint
      * 
      */
-    public Vector3 CalculateLaunchVelocity(Vector3 targetPoint, bool lowShot) {
+    public Vector3 CalculateLaunchVelocity(Vector3 targetPoint, Vector3 spawnPoint, bool lowShot) {
         // shotSpawn is angled such that it faces targetPoint, not where it actually shoots from. This is good enough aesthetically. for now.
         //transform.rotation = Quaternion.LookRotation(targetPoint - transform.position);
-        shotSpawn = transform.position + transform.rotation * launchPosition;
+        //shotSpawn = transform.position + transform.rotation * launchPosition;
+        shotSpawn = spawnPoint;
         Vector3 vectorFromShotToTarget = targetPoint - shotSpawn;
 
         Vector3 horizontalComponent = new Vector3(vectorFromShotToTarget.x, 0f, vectorFromShotToTarget.z);
@@ -117,9 +119,6 @@ public class Shooter : MonoBehaviour {
     }
 
     protected virtual IEnumerator Loading() {
-        if (!nocked) {
-            Nock();
-        }
         isLoading = true;
         shooterAnimator.SetBool("IsLoading", true);
 
@@ -135,14 +134,6 @@ public class Shooter : MonoBehaviour {
         isLoading = false;
         shooterAnimator.SetBool("IsLoading", false);
         StopCoroutine(loadingRoutine);
-    }
-
-    public void Nock() {
-        nocked = true;
-    }
-
-    public void Unnock() {
-        nocked = false;
     }
 
     public void Undraw() {

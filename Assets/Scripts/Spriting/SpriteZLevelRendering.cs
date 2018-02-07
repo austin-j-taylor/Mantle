@@ -10,22 +10,30 @@ using UnityEngine;
 public class SpriteZLevelRendering : MonoBehaviour {
 
     [HideInInspector]
-    public int[] relativeLayers;
+    public int[] relativeSpriteLayers;
+    public int[] relativeLineRendererLayers;
 
     private const int IsometricRangePerZUnit = 10;
     private const int LayerDifferenceConstant = 100;
-    
-    private SpriteRenderer[] spriteChildren;
+
+    public SpriteRenderer[] spriteChildren;
+    public LineRenderer[] lineRendererChildren;
     private Transform movingObject;
 
-    private void Start() {
+    private void Awake() {
         movingObject = transform.parent;
 
         spriteChildren = GetComponentsInChildren<SpriteRenderer>();
+        lineRendererChildren = GetComponentsInChildren<LineRenderer>();
 
-        relativeLayers = new int[spriteChildren.Length];
+        relativeSpriteLayers = new int[spriteChildren.Length];
         for (int i = 0; i < spriteChildren.Length; i++) {
-            relativeLayers[i] = spriteChildren[i].sortingOrder;
+            relativeSpriteLayers[i] = spriteChildren[i].sortingOrder;
+        }
+
+        relativeLineRendererLayers = new int[lineRendererChildren.Length];
+        for (int i = 0; i < lineRendererChildren.Length; i++) {
+            relativeLineRendererLayers[i] = lineRendererChildren[i].sortingOrder;
         }
     }
     void Update () {
@@ -39,8 +47,13 @@ public class SpriteZLevelRendering : MonoBehaviour {
         float layeringValue = distanceToPlayerAxis;
 
         for (int i = 0; i < spriteChildren.Length; i++) {
-            int sortingOrder = (int)(layeringValue * IsometricRangePerZUnit) * LayerDifferenceConstant + relativeLayers[i];
+            int sortingOrder = (int)(layeringValue * IsometricRangePerZUnit) * LayerDifferenceConstant + relativeSpriteLayers[i];
             spriteChildren[i].sortingOrder = sortingOrder;
+        }
+
+        for (int i = 0; i < lineRendererChildren.Length; i++) {
+            int sortingOrder = (int)(layeringValue * IsometricRangePerZUnit) * LayerDifferenceConstant + relativeLineRendererLayers[i];
+            lineRendererChildren[i].sortingOrder = sortingOrder;
         }
     }
 }

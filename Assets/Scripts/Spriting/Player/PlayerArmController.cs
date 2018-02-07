@@ -8,20 +8,22 @@ public class PlayerArmController : MonoBehaviour {
     public GameObject rightArm;
 
     private PlayerWeaponController player;
+    private PlayerBowController bowController;
     private SpriteZLevelRendering zRenderer;
 
     // Default layer values
-    private const int frontRight = 31;
-    private const int frontLeft = 30;
-    private const int behindRight = 11;
-    private const int behindLeft = 10;
+    private const int frontRight = 61;
+    private const int frontLeft = 60;
+    private const int behindRight = 41;
+    private const int behindLeft = 40;
 
     private const int left = 1;
     private const int right = 2;
 
     void Start() {
+        bowController = GetComponent<PlayerBowController>();
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerWeaponController>();
-        zRenderer = gameObject.GetComponent<SpriteZLevelRendering>();
+        zRenderer = GetComponent<SpriteZLevelRendering>();
     }
 
     public void WalkingUpFromLeftOn() {
@@ -45,23 +47,21 @@ public class PlayerArmController : MonoBehaviour {
     }
 
     private void SetLeftHandBehind() {
-        zRenderer.relativeLayers[left] = behindLeft;
+        zRenderer.relativeSpriteLayers[left] = behindLeft;
     }
 
     private void SetRightHandBehind() {
-        zRenderer.relativeLayers[right] = behindRight;
+        //bowController.SetBowBehind();
+        zRenderer.relativeSpriteLayers[right] = behindRight;
     }
 
     private void SetLeftHandFront() {
-        zRenderer.relativeLayers[left] = frontLeft;
+        zRenderer.relativeSpriteLayers[left] = frontLeft;
     }
 
     private void SetRightHandFront() {
-        zRenderer.relativeLayers[right] = frontRight;
-    }
-
-    private void PullArrowFromQuiver() {
-        player.PullArrowFromQuiver();
+        //bowController.SetBowFront();
+        zRenderer.relativeSpriteLayers[right] = frontRight;
     }
 
 }

@@ -15,9 +15,6 @@ public class Bow : Shooter {
     }
 
     protected override IEnumerator Loading() {
-        if (!nocked) {
-            Nock();
-        }
         IsLoading = true;
         shooterAnimator.SetBool("IsLoading", true);
 

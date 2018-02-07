@@ -17,9 +17,16 @@ public class BowstringController : MonoBehaviour {
     public Transform topPivot;
     public Transform bottomPivot;
 
+    public Transform leftHandProjectileAnchor;
+
+    public Bow bow;
+
+    public Animation mycurfl;
+
     private LineRenderer bowstring;
     private LineRenderer topCable;
     private LineRenderer bottomCable;
+    private Animator bowAnim;
 
     //private const int largeUpperAngle = 349;
     //private const int largeLowerAngle = 113;
@@ -28,11 +35,15 @@ public class BowstringController : MonoBehaviour {
     private const int innerUpperAngle = 270;
     private const int innerLowerAngle = 165;
 
+    private bool shouldSoonFire;
+
     void Start() {
+        shouldSoonFire = false;
 
         bowstring = GetComponent<LineRenderer>();
         topCable = topPivot.GetComponent<LineRenderer>();
         bottomCable = bottomPivot.GetComponent<LineRenderer>();
+        bowAnim = bow.GetComponent<Animator>();
 
         topCable.SetPosition(0, Vector3.zero);
         bottomCable.SetPosition(0, Vector3.zero);
@@ -43,11 +54,10 @@ public class BowstringController : MonoBehaviour {
         nockPosition.position = (topStringAnchor.position + bottomStringAnchor.position) / 2;
 
     }
-
-    public float stringAngularRotation;
-    public float cableAngularRotation;
-
+    
     void Update() {
+
+
         // cam rotation magic
         float drawDistance = nock.localPosition.x;
 
@@ -65,7 +75,7 @@ public class BowstringController : MonoBehaviour {
 
         // setting string angular positions
 
-        stringAngularRotation = -drawDistance * 570;
+        float stringAngularRotation = -drawDistance * 570;
 
         stringAngularRotation %= 360;
         if (stringAngularRotation < 0) {
@@ -80,7 +90,7 @@ public class BowstringController : MonoBehaviour {
             bottomStringAnchor.localPosition = Quaternion.AngleAxis(-stringAngularRotation, transform.forward) * camOuterSmallRadius + new Vector3(.0375f, .0375f, 0);
         }
 
-        cableAngularRotation = -drawDistance * 500 + 180;
+        float cableAngularRotation = -drawDistance * 500 + 180;
 
         cableAngularRotation %= 360;
         if (cableAngularRotation < 0) {
@@ -95,6 +105,17 @@ public class BowstringController : MonoBehaviour {
             bottomCableAnchor.localPosition = Quaternion.AngleAxis(-cableAngularRotation, transform.forward) * camInnerSmallRadius + new Vector3(-.01875f, -.01875f, 0);
         }
 
+        
+    }
+    private void LateUpdate() {
+        // if bow is being drawn, make the nock's position equal to the player's left hand position
+        if (bow.IsLoading || bow.Loaded) {
+            nock.position = leftHandProjectileAnchor.position;
+            shouldSoonFire = true;
+        } else if(shouldSoonFire) {
+
+            shouldSoonFire = false;
+        }
 
         // update line positions
         bowstring.SetPosition(0, transform.InverseTransformPoint(topStringAnchor.position));
@@ -103,8 +124,5 @@ public class BowstringController : MonoBehaviour {
 
         topCable.SetPosition(1, topPivot.InverseTransformPoint(bottomCableAnchor.position));
         bottomCable.SetPosition(1, bottomPivot.InverseTransformPoint(topCableAnchor.position));
-
-
-
     }
 }
