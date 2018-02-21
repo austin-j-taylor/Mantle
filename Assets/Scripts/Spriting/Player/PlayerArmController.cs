@@ -4,12 +4,9 @@ using UnityEngine;
 
 public class PlayerArmController : MonoBehaviour {
 
-    public GameObject leftArm;
-    public GameObject rightArm;
-
     private PlayerWeaponController player;
-    private PlayerBowController bowController;
     private SpriteZLevelRendering zRenderer;
+    private PlayerBowController bowController;
 
     // Default layer values
     private const int frontRight = 61;
@@ -18,7 +15,7 @@ public class PlayerArmController : MonoBehaviour {
     private const int behindLeft = 40;
 
     private const int left = 1;
-    private const int right = 2;
+    private const int right = 4;
 
     void Start() {
         bowController = GetComponent<PlayerBowController>();

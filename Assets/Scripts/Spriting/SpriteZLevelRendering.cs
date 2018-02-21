@@ -9,15 +9,16 @@ using UnityEngine;
  
 public class SpriteZLevelRendering : MonoBehaviour {
 
-    [HideInInspector]
+    //[HideInInspector]
     public int[] relativeSpriteLayers;
     public int[] relativeLineRendererLayers;
 
     private const int IsometricRangePerZUnit = 10;
     private const int LayerDifferenceConstant = 100;
-
+    
     public SpriteRenderer[] spriteChildren;
     public LineRenderer[] lineRendererChildren;
+
     private Transform movingObject;
 
     private void Awake() {
@@ -36,6 +37,7 @@ public class SpriteZLevelRendering : MonoBehaviour {
             relativeLineRendererLayers[i] = lineRendererChildren[i].sortingOrder;
         }
     }
+
     void Update () {
         Vector3 playerPosition = PlayerMovementController.GetPlayerPosition();
         float cameraY = Camera.main.transform.rotation.eulerAngles.y;
@@ -56,4 +58,15 @@ public class SpriteZLevelRendering : MonoBehaviour {
             lineRendererChildren[i].sortingOrder = sortingOrder;
         }
     }
+
+    public void UpdateSpriteChildren() {
+        spriteChildren = GetComponentsInChildren<SpriteRenderer>();
+
+        relativeSpriteLayers = new int[spriteChildren.Length];
+        for (int i = 0; i < spriteChildren.Length; i++) {
+            relativeSpriteLayers[i] = spriteChildren[i].sortingOrder;
+        }
+
+    }
+
 }

@@ -14,10 +14,8 @@ public class Shooter : MonoBehaviour {
     protected bool nocked = false;
     protected bool isLoading = false;
     protected bool loaded = false;
-    protected Vector3 launchPosition; // position on the weapon at which the shot appears
 
     private LineRenderer predictedPath;
-    private Vector3 shotSpawn;
     private Coroutine loadingRoutine;
 
     // constants for physics calculations
@@ -43,7 +41,6 @@ public class Shooter : MonoBehaviour {
     void Start() {
         predictedPath = GetComponent<LineRenderer>();
         shooterAnimator = GetComponent<Animator>();
-        launchPosition = new Vector3(0f, 0f, .5f);
         SetVelocityShortcuts();
     }
 
@@ -53,14 +50,14 @@ public class Shooter : MonoBehaviour {
     }
 
     /*
-     * Fires this Shooter's Projectile from launchPosition such that it will pass through targetPoint
-     * 
+     * Calculates the launch velocity of this shooter's projectile such that the projectile passes from spawnPoint to targetPoint.
+     * lowShot determines if the projectile takes the low path or the high path, since there'll always be 2 from the quadratic equation.
      */
     public Vector3 CalculateLaunchVelocity(Vector3 targetPoint, Vector3 spawnPoint, bool lowShot) {
         // shotSpawn is angled such that it faces targetPoint, not where it actually shoots from. This is good enough aesthetically. for now.
         //transform.rotation = Quaternion.LookRotation(targetPoint - transform.position);
         //shotSpawn = transform.position + transform.rotation * launchPosition;
-        shotSpawn = spawnPoint;
+        Vector3 shotSpawn = spawnPoint;
         Vector3 vectorFromShotToTarget = targetPoint - shotSpawn;
 
         Vector3 horizontalComponent = new Vector3(vectorFromShotToTarget.x, 0f, vectorFromShotToTarget.z);
@@ -81,13 +78,33 @@ public class Shooter : MonoBehaviour {
         Vector3 trueVelocityDirection = new Vector3(horizontalComponentDirection.x * Mathf.Cos(radiansUp), Mathf.Sin(radiansUp), horizontalComponentDirection.z * Mathf.Cos(radiansUp));
 
         Vector3 trueVelocity = trueVelocityDirection * velocity;
-
-        RotateToLaunch(radiansUp * 180 / Mathf.PI);
+        
+        //RotateToLaunch(angle);
 
         return trueVelocity;
 
     }
+    
+    public float CalculateBowAngle(Vector3 targetPoint, Vector3 anchorPoint, bool lowShot) {
+        Vector3 shotSpawn = anchorPoint;
+        Vector3 vectorFromShotToTarget = targetPoint - shotSpawn;
+        Vector3 horizontalComponent = new Vector3(vectorFromShotToTarget.x, 0f, vectorFromShotToTarget.z);
 
+        float height = targetPoint.y - shotSpawn.y;
+        float distance = horizontalComponent.magnitude;
+
+        // Calculus
+        float gravity = -Physics.gravity.y; // needs to be positive
+        float underRoot = velocity4 - gravity * (gravity * distance * distance + 2 * velocity2 * height);
+        underRoot = underRoot < 0 ? 0 : underRoot;
+
+        float radiansUp = Mathf.Atan(
+                (velocity2 + (lowShot ? -1 : 1) * Mathf.Sqrt(underRoot))
+              / (gravity * distance));
+
+        return radiansUp * 180 / Mathf.PI;
+    }
+    
     public Projectile SpawnProjectile(Vector3 spawnPosition, Quaternion spawnRotation) {
         Projectile newProjectile = Instantiate(projectile, spawnPosition, spawnRotation);
         newProjectile.GetComponent<Collider>().enabled = false;
@@ -98,7 +115,7 @@ public class Shooter : MonoBehaviour {
 
     public void Fire(Vector3 launchVelocity, Projectile shot) {
 
-        shot.transform.parent = null;
+        shot.transform.SetParent(null, true);
         shot.GetComponent<Collider>().enabled = true;
         shot.GetComponent<Rigidbody>().isKinematic = false;
 
@@ -107,9 +124,7 @@ public class Shooter : MonoBehaviour {
         nocked = false;
         loaded = false;
         shot.InHand = false;
-
-        //Projectile shot = Instantiate(projectile, shotSpawn, Quaternion.LookRotation(launchVelocity));
-
+        
         shot.GetComponent<Rigidbody>().velocity = launchVelocity;
     }
 
@@ -150,34 +165,34 @@ public class Shooter : MonoBehaviour {
     /*
      * Visually predicts the path the projectile would take if it launched with the current velocity
      */
-    public void PredictPath(Vector3 launchVelocity, Vector3 targetPos) {
+    //public void PredictPath(Vector3 launchVelocity, Vector3 targetPos) {
 
-        int segmentCount = 40;
-        float segmentScale = .5f;
+    //    int segmentCount = 40;
+    //    float segmentScale = .5f;
 
-        predictedPath.enabled = true;
+    //    predictedPath.enabled = true;
 
-        Vector3[] segments = new Vector3[segmentCount];
-        segments[0] = shotSpawn;
-        Vector3 segVelocity = launchVelocity;
+    //    Vector3[] segments = new Vector3[segmentCount];
+    //    segments[0] = shotSpawn;
+    //    Vector3 segVelocity = launchVelocity;
 
-        for (int i = 1; i < segmentCount; i++) {
-            float segTime = segmentScale / segVelocity.magnitude;
+    //    for (int i = 1; i < segmentCount; i++) {
+    //        float segTime = segmentScale / segVelocity.magnitude;
 
-            segVelocity = segVelocity + Physics.gravity * segTime;
+    //        segVelocity = segVelocity + Physics.gravity * segTime;
 
-            if (false) {
+    //        if (false) {
 
-            } else {
-                segments[i] = segments[i - 1] + segVelocity * segTime;
-            }
-        }
+    //        } else {
+    //            segments[i] = segments[i - 1] + segVelocity * segTime;
+    //        }
+    //    }
 
-        //predictedPath.numPositions(segmentCount);
-        predictedPath.SetPositions(segments);
-        //for(int i = 0; i < segmentCount; i++) {
-        //    predictedPath.SetPosition(i, segments[i]);
-        //}
+    //    //predictedPath.numPositions(segmentCount);
+    //    predictedPath.SetPositions(segments);
+    //    //for(int i = 0; i < segmentCount; i++) {
+    //    //    predictedPath.SetPosition(i, segments[i]);
+    //    //}
 
-    }
+    //}
 }

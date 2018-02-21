@@ -63,6 +63,19 @@ public class Projectile : MonoBehaviour {
 
         transform.parent = scaleUnMesserUpper.transform;
 
+        // search for zRenderer in parent chain.
+        // if there's a zRenderer, notify it to refresh its spriteChildren.
+        SpriteZLevelRendering rendererToBeNotified = null;
+        Transform currentParent = scaleUnMesserUpper.transform;
+        while(rendererToBeNotified == null && currentParent != null) {
+            rendererToBeNotified = currentParent.GetComponent<SpriteZLevelRendering>();
+            currentParent = currentParent.parent;
+        }
+        if(rendererToBeNotified != null) {
+            rendererToBeNotified.UpdateSpriteChildren();
+        }
+
+
     }
     public void SetTailPositionNocked() {
         transform.localPosition = nockedPositionOffset;

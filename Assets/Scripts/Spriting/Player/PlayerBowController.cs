@@ -7,6 +7,10 @@ public class PlayerBowController : MonoBehaviour {
     private PlayerWeaponController player;
     private SpriteZLevelRendering zRenderer;
     private Transform playerBody;
+    private SpriteRenderer projectileSpriteHolder1;
+    private SpriteRenderer projectileSpriteHolder2;
+
+    private bool playerIsHoldingArrow;
 
     // Default layer values
     private const int frontQuiver = 57;
@@ -15,6 +19,10 @@ public class PlayerBowController : MonoBehaviour {
     private const int behindLimb = 30;
     private const int frontRiser = 71;
     private const int behindRiser = 29;
+    private const int frontProjectile1 = 80;
+    private const int behindProjectile1 = 20;
+    private const int frontProjectile2 = 81;
+    private const int behindProjectile2 = 19;
     private const int frontCam = 72;
     private const int behindCam = 28;
     private const int frontBowstring = 75;
@@ -26,12 +34,14 @@ public class PlayerBowController : MonoBehaviour {
 
     // spriteChildren indices
     private const int body = 0;
-    private const int riser = 3;
-    private const int topLimb = 4;
-    private const int topCam = 5;
-    private const int bottomLimb = 6;
-    private const int bottomCam = 7;
-    private const int quiver = 8;
+    private const int projectile1 = 2;
+    private const int projectile2 = 3;
+    private const int riser = 5;
+    private const int topLimb = 6;
+    private const int topCam = 7;
+    private const int bottomLimb = 8;
+    private const int bottomCam = 9;
+    private const int quiver = 10;
     private const int bowstring = 1;
     private const int topCable = 2;
     private const int bottomCable = 3;
@@ -39,7 +49,12 @@ public class PlayerBowController : MonoBehaviour {
     void Start () {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerWeaponController>();
         zRenderer = gameObject.GetComponent<SpriteZLevelRendering>();
+
+        projectileSpriteHolder1 = zRenderer.spriteChildren[projectile1];
+        projectileSpriteHolder2 = zRenderer.spriteChildren[projectile2];
+
         playerBody = zRenderer.spriteChildren[body].transform;
+        playerIsHoldingArrow = false;
     }
     private void Update() {
         // send to front or back, depending on player's rotation
@@ -51,22 +66,49 @@ public class PlayerBowController : MonoBehaviour {
             zRenderer.relativeSpriteLayers[quiver] = frontQuiver;
             SetBowBehind();
         }
+
+        // if the player switches to holding an arrow, notify the sprite renderer
+        if(playerIsHoldingArrow && player.HeldProjectile == null) {
+            playerIsHoldingArrow = false;
+            ReplaceProjectileWithDummy();
+        } else if(!playerIsHoldingArrow && player.HeldProjectile != null) {
+            playerIsHoldingArrow = true;
+            ReplaceDummyWithProjectile();
+        }
     }
 
     private void PullArrowFromQuiver() {
         player.PullArrowFromQuiver();
+        // replace dummy sprite with arrow sprite
+        ReplaceDummyWithProjectile();
     }
 
     private void ReplaceArrowIntoQuiver() {
         player.ReplaceArrowIntoQuiver();
+        // replace arrow sprite with dummy sprite
+        ReplaceProjectileWithDummy();
     }
 
     private void SetArrowNockedOnBowstring() {
         player.SetArrowNockedOnBowstring();
     }
 
+    // Replaces the dummy sprite in player's left hand with the player's actual projectile
+    private void ReplaceDummyWithProjectile() {
+        zRenderer.spriteChildren[projectile1] = player.HeldProjectile.GetComponentsInChildren<SpriteRenderer>()[0];
+        zRenderer.spriteChildren[projectile2] = player.HeldProjectile.GetComponentsInChildren<SpriteRenderer>()[1];
+    }
+
+    // Vice-versa
+    private void ReplaceProjectileWithDummy() {
+        zRenderer.spriteChildren[projectile1] = projectileSpriteHolder1;
+        zRenderer.spriteChildren[projectile2] = projectileSpriteHolder2;
+    }
+
     public void SetBowFront() {
         zRenderer.relativeSpriteLayers[riser] = frontRiser;
+        zRenderer.relativeSpriteLayers[projectile1] = frontProjectile1;
+        zRenderer.relativeSpriteLayers[projectile2] = frontProjectile2;
         zRenderer.relativeSpriteLayers[topLimb] = frontLimb;
         zRenderer.relativeSpriteLayers[topCam] = frontCam;
         zRenderer.relativeSpriteLayers[bottomLimb] = frontLimb;
@@ -78,6 +120,8 @@ public class PlayerBowController : MonoBehaviour {
 
     public void SetBowBehind() {
         zRenderer.relativeSpriteLayers[riser] = behindRiser;
+        zRenderer.relativeSpriteLayers[projectile1] = behindProjectile1;
+        zRenderer.relativeSpriteLayers[projectile2] = behindProjectile2;
         zRenderer.relativeSpriteLayers[topLimb] = behindLimb;
         zRenderer.relativeSpriteLayers[topCam] = behindCam;
         zRenderer.relativeSpriteLayers[bottomLimb] = behindLimb;

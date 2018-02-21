@@ -6,13 +6,27 @@ public class PlayerWeaponController : MonoBehaviour {
 
     public Bow bow;
     public GameObject quiver;
+    public Transform rightArm;
+    public Transform rightHand;
+    public Transform leftHand;
     public Transform projectileAnchor;
 
     private Projectile currentlyHeldProjectile;
+    public Projectile HeldProjectile {
+        get { return currentlyHeldProjectile; }
+    }
 
     private Animator anim;
     private LayerMask ignorePlayerLayer;
-    private float maxRange = 100f;
+
+    private Quaternion rotationLast;
+    private Quaternion offsetLastArm;
+    private Quaternion offsetLastHand;
+
+    private const float maxRange = 100f;
+    private const float armAngle = 63.483f;
+
+    // for launching one projectile every frame
     private bool funMode = false;
 
     void Start() {
@@ -38,8 +52,9 @@ public class PlayerWeaponController : MonoBehaviour {
     }
 
     private void BowUpdate(RaycastHit hit) {
+        //Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, (currentlyHeldProjectile == null) ? bow.transform.position : currentlyHeldProjectile.transform.position, true || !Input.GetButton("Fire3"), out angle);
 
-        Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, (currentlyHeldProjectile == null) ? bow.transform.position : currentlyHeldProjectile.transform.position, !Input.GetButton("Fire3"));
+        float launchAngle = bow.CalculateBowAngle(hit.point, projectileAnchor.position, true || !Input.GetButton("Fire3"));
 
         if (Input.GetKeyDown(KeyCode.F)) {
             funMode = !funMode;
@@ -47,11 +62,13 @@ public class PlayerWeaponController : MonoBehaviour {
         if (funMode && Input.GetButton("Fire1")) {
             // fun mode
             PullArrowFromQuiver();
+            Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, true || !Input.GetButton("Fire3"));
             bow.Fire(launchVelocity, currentlyHeldProjectile);
-            currentlyHeldProjectile = null;
+            ReleaseArrowFromString();
         }
 
         if (bow.Loaded) { // is already loaded
+            AngleBowoAim(launchAngle);
             // if right click, lower bow, keeping arrow nocked
             if (Input.GetButtonDown("Fire2")) {
                 anim.SetBool("IsDrawing", false);
@@ -61,14 +78,16 @@ public class PlayerWeaponController : MonoBehaviour {
 
             // if not holding left click, fire
             if (!Input.GetButton("Fire1")) {
+                Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, true || !Input.GetButton("Fire3"));
+                bow.Fire(launchVelocity, currentlyHeldProjectile);
+                ReleaseArrowFromString();
                 anim.SetBool("IsDrawing", false);
                 anim.SetTrigger("Fire");
-                bow.Fire(launchVelocity, currentlyHeldProjectile);
-                currentlyHeldProjectile = null;
             }
         } else
-            if (bow.IsLoading) { // is currently loading
-                                 // if right click, carefully release draw, keeping arrow nocked
+        if (bow.IsLoading) { // is currently loading
+            AngleBowoAim(launchAngle);
+            // if right click, carefully release draw, keeping arrow nocked
             if (Input.GetButtonDown("Fire2")) {
                 anim.SetBool("IsDrawing", false);
                 anim.SetTrigger("Unnock");
@@ -79,12 +98,12 @@ public class PlayerWeaponController : MonoBehaviour {
             if (!Input.GetButton("Fire1")) {
                 bow.CeaseLoad();
                 // make me littler launch velocity
+                Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, true || !Input.GetButton("Fire3"));
+                bow.Fire((bow.DrawingTime / bow.LoadTime) * launchVelocity, currentlyHeldProjectile);
+                ReleaseArrowFromString();
                 anim.SetBool("IsDrawing", false);
                 anim.SetTrigger("Fire");
-                bow.Fire((bow.DrawingTime / bow.LoadTime) * launchVelocity, currentlyHeldProjectile);
-                currentlyHeldProjectile = null;
             }
-
         } else { // not loaded, is not alreading loading
                  // if nocked and left click, begin loading bow
             if (bow.Nocked) {
@@ -93,7 +112,7 @@ public class PlayerWeaponController : MonoBehaviour {
                     anim.SetTrigger("Unnock");
                     SetArrowNotNockedOnBowstring();
                 } else
-                if (Input.GetButtonDown("Fire1")) {
+                if (Input.GetButton("Fire1")) {
                     anim.SetBool("IsDrawing", true);
                     bow.Load();
                 }
@@ -103,8 +122,12 @@ public class PlayerWeaponController : MonoBehaviour {
                     anim.SetTrigger("Nock");
                 }
             }
-
         }
+    }
+
+    public void ReleaseArrowFromString() {
+        currentlyHeldProjectile = null;
+
     }
 
     public void PullArrowFromQuiver() {
@@ -122,9 +145,31 @@ public class PlayerWeaponController : MonoBehaviour {
         currentlyHeldProjectile.SetTailPositionNocked();
     }
 
-    private void SetArrowNotNockedOnBowstring() {
+    private void SetArrowNotNockedOnBowstring() { 
         bow.Nocked = false;
         currentlyHeldProjectile.transform.SetParent(projectileAnchor, true);
         //currentlyHeldProjectile.SetTailPositionNotNocked();
     }
+
+    private void AngleBowoAim(float angle) {
+        float handPositionDifference = rightHand.position.x - projectileAnchor.position.x;
+        float rightShoulderToAnchor = rightArm.position.x - projectileAnchor.position.x;
+        float adjacent = handPositionDifference - rightShoulderToAnchor;
+        float opposite = handPositionDifference * Mathf.Tan(angle * Mathf.PI / 180);
+        float shoulderAngle = Mathf.Atan2(opposite, adjacent) * 180 / Mathf.PI;
+
+
+        Quaternion offsetNowArm = Quaternion.Lerp(offsetLastArm, Quaternion.Euler(0, 0, shoulderAngle), 10 * Time.deltaTime);
+        offsetLastArm = offsetNowArm;
+        rightArm.transform.localRotation =  rightArm.transform.localRotation * offsetNowArm;
+
+
+        // arm has been rotated, but right hand must be rotated to align with left arm (with angle)
+        Quaternion offsetNowHand = Quaternion.Lerp(offsetLastHand, Quaternion.Euler(0, 0, -angle), 10 * Time.deltaTime);
+        offsetLastHand = offsetNowHand;
+        rightHand.transform.localRotation = rightHand.transform.localRotation * offsetNowHand;
+
+        // rotate arrow to align with bow
+    }
+
 }

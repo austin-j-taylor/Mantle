@@ -10,7 +10,6 @@ public class Bow : Shooter {
         shooterAnimator = GetComponent<Animator>();
         velocity = 20;
         loadTime = 1f;
-        launchPosition = new Vector3(0f, 0f, .5f);
         SetVelocityShortcuts();
     }
 
