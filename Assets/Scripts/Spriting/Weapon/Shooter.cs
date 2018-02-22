@@ -5,8 +5,6 @@ using UnityEngine;
 public class Shooter : MonoBehaviour {
 
     public Projectile projectile;
-    public Transform nockHand;
-    public Transform nockRiser;
 
     protected Animator shooterAnimator;
 

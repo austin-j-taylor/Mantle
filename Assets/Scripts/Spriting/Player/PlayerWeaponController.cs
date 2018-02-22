@@ -19,10 +19,6 @@ public class PlayerWeaponController : MonoBehaviour {
     private Animator anim;
     private LayerMask ignorePlayerLayer;
 
-    private Quaternion rotationLast;
-    private Quaternion offsetLastArm;
-    private Quaternion offsetLastHand;
-
     private const float maxRange = 100f;
     private const float armAngle = 63.483f;
 
@@ -68,7 +64,7 @@ public class PlayerWeaponController : MonoBehaviour {
         }
 
         if (bow.Loaded) { // is already loaded
-            AngleBowAim(launchAngle);
+            bow.AngleBowAim(launchAngle);
             // if right click, lower bow, keeping arrow nocked
             if (Input.GetButtonDown("Fire2")) {
                 anim.SetBool("IsDrawing", false);
@@ -86,7 +82,7 @@ public class PlayerWeaponController : MonoBehaviour {
             }
         } else
         if (bow.IsLoading) { // is currently loading
-            AngleBowAim(launchAngle);
+            bow.AngleBowAim(launchAngle);
             // if right click, carefully release draw, keeping arrow nocked
             if (Input.GetButtonDown("Fire2")) {
                 anim.SetBool("IsDrawing", false);
@@ -150,77 +146,4 @@ public class PlayerWeaponController : MonoBehaviour {
         currentlyHeldProjectile.transform.SetParent(projectileAnchor, true);
         //currentlyHeldProjectile.SetTailPositionNotNocked();
     }
-    public float bowAngel;
-    public float shoulderAngle;
-    public float angleRiser;
-    public float angleToBow;
-    public float x;
-    public float y;
-    public float xbow;
-    public float ybow;
-    //public float xRis;
-    //public float yRis;
-    //public float xHand;
-    //public float yHand;
-    public Vector3 riser;
-    public Vector3 nockPos;
-    public Vector3 riserp;
-    public Vector3 handp;
-    public Vector3 bowp;
-    public Transform handNock;
-
-    private void AngleBowAim(float bowAngle) {
-        // some blessed trig
-        //float handPositionDifference = rightHand.position.x - projectileAnchor.position.x;
-        //float rightShoulderToAnchor = rightArm.position.x - projectileAnchor.position.x;
-        //float adjacent = handPositionDifference - rightShoulderToAnchor;
-        //float opposite = handPositionDifference * Mathf.Tan(bowAngle * Mathf.PI / 180);
-        //float shoulderAngle = Mathf.Atan2(opposite, adjacent) * 180 / Mathf.PI;
-
-        //float armAngle = 1.36f * shoulderAngle;
-        //float handAngle = .68f * -shoulderAngle;
-
-        //Quaternion offsetNowArm = Quaternion.Lerp(offsetLastArm, Quaternion.Euler(0, 0, armAngle), 1);//5 * Time.deltaTime);
-        //offsetLastArm = offsetNowArm;
-        //rightArm.localRotation = rightArm.localRotation * offsetNowArm;
-
-        //// arm has been rotated, but right hand must be rotated to align with left arm (with angle)
-        //Quaternion offsetNowHand = Quaternion.Lerp(offsetLastHand, Quaternion.Euler(0, 0, handAngle), 1);//5 * Time.deltaTime);
-        //offsetLastHand = offsetNowHand;
-        //rightHand.localRotation = rightHand.localRotation * offsetNowHand;
-
-        //// rotate arrow to align with bow
-        ////y = bow.nockRiser.position.y - bow.nockHand.position.y;
-        ////x = bow.nockRiser.position.x - bow.nockHand.position.x;
-        ////ybow = bow.transform.position.y - bow.nockHand.position.y;
-        ////xbow = bow.transform.position.x - bow.nockHand.position.x;
-        ////xRis = bow.transform.InverseTransformPoint(bow.nockRiser.position).z;
-        ////yRis = bow.transform.InverseTransformPoint(bow.nockRiser.position).y;
-        ////xHand = bow.transform.InverseTransformPoint(bow.nockHand.position).z;
-        ////yHand = bow.transform.InverseTransformPoint(bow.nockHand.position).y;
-        //x = bow.nockHand.localPosition.x + bow.nockHand.parent.localPosition.x + bow.nockRiser.localPosition.x;
-        //y = bow.nockHand.localPosition.y + bow.nockHand.parent.localPosition.y + bow.nockRiser.localPosition.y;
-        nockPos = handNock.localPosition;
-        Debug.Log(handNock.localPosition);
-        //handp = bow.nockHand.parent.localPosition;
-        //riserp = bow.nockRiser.localPosition;
-
-        //////float y = yRis - yHand;
-        //////float x = xRis - xHand;
-        ////riser = bow.transform.InverseTransformPoint(bow.nockRiser.position);
-        ////hand = bow.transform.InverseTransformPoint(bow.nockHand.position);
-        ////riserp = bow.nockRiser.position;
-        ////handp = bow.nockHand.position;
-        ////bowp = bow.transform.position;
-
-        //float angleToRiserNock = (Mathf.Atan2(y, x)) * 180 / Mathf.PI;
-        ////angleToBow = Mathf.Atan2(ybow, xbow) * 180 / Mathf.PI;
-        ////bow.nockHand.localEulerAngles = new Vector3(0, 0, -(angleToRiserNock - angleToBow));
-        //bow.nockHand.localEulerAngles = new Vector3(0, 0, -(angleToRiserNock - angleToBow));
-
-        //bowAngel = bowAngle;
-        //this.shoulderAngle = shoulderAngle;
-        //angleRiser = angleToRiserNock;
-    }
-
 }
