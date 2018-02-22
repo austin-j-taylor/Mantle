@@ -22,7 +22,7 @@ public class SpriteZLevelRendering : MonoBehaviour {
     private Transform movingObject;
 
     private void Awake() {
-        movingObject = transform.parent;
+        movingObject = transform;
 
         spriteChildren = GetComponentsInChildren<SpriteRenderer>();
         lineRendererChildren = GetComponentsInChildren<LineRenderer>();
@@ -59,14 +59,14 @@ public class SpriteZLevelRendering : MonoBehaviour {
         }
     }
 
-    public void UpdateSpriteChildren() {
-        spriteChildren = GetComponentsInChildren<SpriteRenderer>();
+    //public void UpdateSpriteChildren() {
+    //    spriteChildren = GetComponentsInChildren<SpriteRenderer>();
 
-        relativeSpriteLayers = new int[spriteChildren.Length];
-        for (int i = 0; i < spriteChildren.Length; i++) {
-            relativeSpriteLayers[i] = spriteChildren[i].sortingOrder;
-        }
+    //    relativeSpriteLayers = new int[spriteChildren.Length];
+    //    for (int i = 0; i < spriteChildren.Length; i++) {
+    //        relativeSpriteLayers[i] = spriteChildren[i].sortingOrder;
+    //    }
 
-    }
+    //}
 
 }

@@ -21,12 +21,9 @@ public class BowstringController : MonoBehaviour {
 
     public Bow bow;
 
-    public Animation mycurfl;
-
     private LineRenderer bowstring;
     private LineRenderer topCable;
     private LineRenderer bottomCable;
-    private Animator bowAnim;
 
     //private const int largeUpperAngle = 349;
     //private const int largeLowerAngle = 113;
@@ -43,7 +40,6 @@ public class BowstringController : MonoBehaviour {
         bowstring = GetComponent<LineRenderer>();
         topCable = topPivot.GetComponent<LineRenderer>();
         bottomCable = bottomPivot.GetComponent<LineRenderer>();
-        bowAnim = bow.GetComponent<Animator>();
 
         topCable.SetPosition(0, Vector3.zero);
         bottomCable.SetPosition(0, Vector3.zero);
@@ -59,7 +55,7 @@ public class BowstringController : MonoBehaviour {
 
 
         // cam rotation magic
-        float drawDistance = nock.localPosition.x;
+        float drawDistance = nock.localPosition.x / 5;
 
         topCam.localRotation = Quaternion.Euler(0, 0, -drawDistance * 450);
         bottomCam.localRotation = Quaternion.Euler(0, 0, drawDistance * 450);
@@ -107,6 +103,7 @@ public class BowstringController : MonoBehaviour {
 
         
     }
+    
     private void LateUpdate() {
         // if bow is being drawn, make the nock's position equal to the player's left hand position
         if (bow.IsLoading || bow.Loaded) {
