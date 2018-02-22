@@ -157,8 +157,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectile: {fileID: 114866319332997190, guid: 222fcbf5398f38b498dcbe328088f8c1,
     type: 2}
+  rightArm: {fileID: 119310130}
+  rightHand: {fileID: 380588880}
   nockHand: {fileID: 1641500384}
   nockRiser: {fileID: 1760190424}
+  projectileAnchor: {fileID: 502703675}
 --- !u!4 &92403493 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4741045283044552, guid: cb904d0fcbb11e642a213eac5e908fb2,
@@ -1272,20 +1275,6 @@ MonoBehaviour:
   rightHand: {fileID: 380588880}
   leftHand: {fileID: 386449029}
   projectileAnchor: {fileID: 502703675}
-  bowAngel: 0
-  shoulderAngle: 0
-  angleRiser: 0
-  angleToBow: 0
-  x: 0
-  y: 0
-  xbow: 0
-  ybow: 0
-  riser: {x: 0, y: 0, z: 0}
-  nockPos: {x: 0, y: 0, z: 0}
-  riserp: {x: 0, y: 0, z: 0}
-  handp: {x: 0, y: 0, z: 0}
-  bowp: {x: 0, y: 0, z: 0}
-  handNock: {fileID: 1641500384}
 --- !u!114 &615978433
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -51,8 +51,7 @@ public class BowstringController : MonoBehaviour {
 
 
         // cam rotation magic
-        float drawDistance = nock.localPosition.x / 5;
-
+        float drawDistance = nock.localPosition.x;
         topCam.localRotation = Quaternion.Euler(0, 0, -drawDistance * 450);
         bottomCam.localRotation = Quaternion.Euler(0, 0, drawDistance * 450);
 
@@ -67,6 +66,7 @@ public class BowstringController : MonoBehaviour {
 
         // setting string angular positions
 
+        //float stringAngularRotation = -drawDistance * 570;
         float stringAngularRotation = -drawDistance * 570;
 
         stringAngularRotation %= 360;
@@ -82,6 +82,7 @@ public class BowstringController : MonoBehaviour {
             bottomStringAnchor.localPosition = Quaternion.AngleAxis(-stringAngularRotation, transform.forward) * camOuterSmallRadius + new Vector3(.0375f, .0375f, 0);
         }
 
+        //float cableAngularRotation = -drawDistance * 500 + 180;
         float cableAngularRotation = -drawDistance * 500 + 180;
 
         cableAngularRotation %= 360;
@@ -100,12 +101,15 @@ public class BowstringController : MonoBehaviour {
 
     }
 
+    // if bow is being drawn, make the nock's position equal to the player's projectile anchor.
+    // May be called from multiple times per frame because Unity's animation system is  hard to work around.
     public void AttachStringToHand() {
-        // if bow is being drawn, make the nock's position equal to the player's left hand position
         nock.position = leftHandProjectileAnchor.position;
     }
-    private void LateUpdate() {
 
+    private void LateUpdate() {
+        if (bow.IsLoading || bow.Loaded)
+            AttachStringToHand();
 
         // update line positions
         bowstring.SetPosition(0, transform.InverseTransformPoint(topStringAnchor.position));

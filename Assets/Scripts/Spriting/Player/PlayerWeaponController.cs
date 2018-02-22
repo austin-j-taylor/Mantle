@@ -6,9 +6,6 @@ public class PlayerWeaponController : MonoBehaviour {
 
     public Bow bow;
     public GameObject quiver;
-    public Transform rightArm;
-    public Transform rightHand;
-    public Transform leftHand;
     public Transform projectileAnchor;
 
     private Projectile currentlyHeldProjectile;
@@ -144,6 +141,5 @@ public class PlayerWeaponController : MonoBehaviour {
     private void SetArrowNotNockedOnBowstring() {
         bow.Nocked = false;
         currentlyHeldProjectile.transform.SetParent(projectileAnchor, true);
-        //currentlyHeldProjectile.SetTailPositionNotNocked();
     }
 }
