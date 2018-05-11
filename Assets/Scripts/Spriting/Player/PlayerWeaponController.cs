@@ -47,7 +47,7 @@ public class PlayerWeaponController : MonoBehaviour {
     private void BowUpdate(RaycastHit hit) {
         //Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, (currentlyHeldProjectile == null) ? bow.transform.position : currentlyHeldProjectile.transform.position, true || !Input.GetButton("Fire3"), out angle);
 
-        float launchAngle = bow.CalculateBowAngle(hit.point, projectileAnchor.position, true || !Input.GetButton("Fire3"));
+        float launchAngle = bow.CalculateBowAngle(hit.point, projectileAnchor.position, !Input.GetButton("Fire3"));
 
         if (Input.GetKeyDown(KeyCode.F)) {
             funMode = !funMode;

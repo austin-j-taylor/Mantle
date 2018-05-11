@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 2ef91c5f72c8e2f4dbd0a95ef5ef85cf
-timeCreated: 1526067543
+guid: 71bd78e33b35e664487ddf689af84cf0
+timeCreated: 1526076264
 licenseType: Free
 ModelImporter:
   serializedVersion: 22
@@ -8,20 +8,20 @@ ModelImporter:
     100000: Body
     100002: elbow_L
     100004: elbow_R
-    100006: forearm_L
-    100008: forearm_R
-    100010: hand_IK_L
-    100012: hand_IK_R
-    100014: hand_L
-    100016: hand_R
-    100018: Hand_Right
-    100020: Head
-    100022: Pawn_Rig
-    100024: //RootNode
-    100026: shoulder_L
-    100028: shoulder_R
-    100030: Shoulders
-    100032: Sphere_001
+    100006: Elbows
+    100008: forearm_L
+    100010: forearm_R
+    100012: hand_IK_L
+    100014: hand_IK_R
+    100016: hand_L
+    100018: hand_R
+    100020: Hands
+    100022: Head
+    100024: Pawn_Rig
+    100026: //RootNode
+    100028: shoulder_L
+    100030: shoulder_R
+    100032: Shoulders
     100034: spine_001
     100036: spine_002
     100038: spine_003
@@ -32,20 +32,20 @@ ModelImporter:
     400000: Body
     400002: elbow_L
     400004: elbow_R
-    400006: forearm_L
-    400008: forearm_R
-    400010: hand_IK_L
-    400012: hand_IK_R
-    400014: hand_L
-    400016: hand_R
-    400018: Hand_Right
-    400020: Head
-    400022: Pawn_Rig
-    400024: //RootNode
-    400026: shoulder_L
-    400028: shoulder_R
-    400030: Shoulders
-    400032: Sphere_001
+    400006: Elbows
+    400008: forearm_L
+    400010: forearm_R
+    400012: hand_IK_L
+    400014: hand_IK_R
+    400016: hand_L
+    400018: hand_R
+    400020: Hands
+    400022: Head
+    400024: Pawn_Rig
+    400026: //RootNode
+    400028: shoulder_L
+    400030: shoulder_R
+    400032: Shoulders
     400034: spine_001
     400036: spine_002
     400038: spine_003
@@ -53,11 +53,12 @@ ModelImporter:
     400042: spine_006
     400044: upper_arm_L
     400046: upper_arm_R
-    2100000: unnamed
+    2100000: Material_Head
+    2100002: Material_Bodies
     4300000: Head
     4300002: Body
-    4300004: Sphere_001
-    4300006: Hand_Right
+    4300004: Elbows
+    4300006: Hands
     7400000: Default Take
     7400002: Pawn_0T-Pose
     7400004: Pawn_Idle
@@ -65,9 +66,9 @@ ModelImporter:
     7400008: Pawn_Walking
     9500000: //RootNode
     13700000: Body
-    13700002: Hand_Right
-    13700004: Head
-    13700006: Sphere_001
+    13700002: Elbows
+    13700004: Hands
+    13700006: Head
   externalObjects: {}
   materials:
     importMaterials: 1
