@@ -37,7 +37,7 @@ public class Shooter : MonoBehaviour {
         get { return loadTime; }
     }
 
-    void Start() {
+    protected void Start() {
         predictedPath = GetComponent<LineRenderer>();
         shooterAnimator = GetComponent<Animator>();
         SetVelocityShortcuts();

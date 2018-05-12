@@ -55,7 +55,7 @@ public class PlayerWeaponController : MonoBehaviour {
         if (funMode && Input.GetButton("Fire1")) {
             // fun mode
             PullArrowFromQuiver();
-            Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, true || !Input.GetButton("Fire3"));
+            Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, !Input.GetButton("Fire3"));
             bow.Fire(launchVelocity, currentlyHeldProjectile);
             ReleaseArrowFromString();
         }
@@ -71,7 +71,7 @@ public class PlayerWeaponController : MonoBehaviour {
 
             // if not holding left click, fire
             if (!Input.GetButton("Fire1")) {
-                Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, true || !Input.GetButton("Fire3"));
+                Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, !Input.GetButton("Fire3"));
                 bow.Fire(launchVelocity, currentlyHeldProjectile);
                 ReleaseArrowFromString();
                 anim.SetBool("IsDrawing", false);
@@ -91,7 +91,7 @@ public class PlayerWeaponController : MonoBehaviour {
             if (!Input.GetButton("Fire1")) {
                 bow.CeaseLoad();
                 // make me littler launch velocity
-                Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, true || !Input.GetButton("Fire3"));
+                Vector3 launchVelocity = bow.CalculateLaunchVelocity(hit.point, currentlyHeldProjectile.transform.position, !Input.GetButton("Fire3"));
                 bow.Fire((bow.DrawingTime / bow.LoadTime) * launchVelocity, currentlyHeldProjectile);
                 ReleaseArrowFromString();
                 anim.SetBool("IsDrawing", false);

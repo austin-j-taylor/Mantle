@@ -18,7 +18,9 @@ public class Bow : Shooter {
     private Quaternion offsetLastArm;
     private Quaternion offsetLastHand;
 
-    private void Start() {
+    new void Start() {
+        base.Start();
+
         bowstringController = GetComponentInChildren<BowstringController>();
         shooterAnimator = GetComponent<Animator>();
         velocity = 20;

@@ -5,12 +5,6 @@ using UnityEngine;
 public class Projectile : MonoBehaviour {
 
     private bool inHand = true;
-    public bool InHand {
-        get { return inHand; }
-        set { inHand = value; }
-    }
-
-    protected Vector3 nockedPositionOffset;
 
     private Transform hit;
     private bool stuck = false;
@@ -19,6 +13,14 @@ public class Projectile : MonoBehaviour {
     private Quaternion lastRotation;
     private Vector3 lastPosition;
     private Vector3 lastSpeed;
+
+    protected float damage;
+    protected Vector3 nockedPositionOffset;
+
+    public bool InHand {
+        get { return inHand; }
+        set { inHand = value; }
+    }
 
     private void Start() {
         nockedPositionOffset = Vector3.zero;
@@ -62,6 +64,11 @@ public class Projectile : MonoBehaviour {
         scaleUnMesserUpper.transform.rotation = new Quaternion();
 
         transform.parent = scaleUnMesserUpper.transform;
+
+        Enemy possibleEnemy = collision.collider.GetComponentInParent<Enemy>();
+        if (possibleEnemy != null) {
+            possibleEnemy.OnHit(damage);
+        }
 
         // search for zRenderer in parent chain.
         // if there's a zRenderer, notify it to refresh its spriteChildren.
