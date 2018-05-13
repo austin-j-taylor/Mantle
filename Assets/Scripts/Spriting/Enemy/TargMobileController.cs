@@ -43,7 +43,7 @@ public class TargMobileController : Enemy {
     public override void OnHit(float damage) {
         base.OnHit(damage);
         // temporarily disable navmesh
-        StartCoroutine(DisableNavAgent(1));
+        //StartCoroutine(DisableNavAgent(1));
 
     }
 
