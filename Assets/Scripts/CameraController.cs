@@ -51,13 +51,13 @@ public class CameraController : MonoBehaviour {
 
         Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
         currentOffset = Vector3.Lerp(currentOffset, player.transform.rotation * offset, moveSmoothing);
-        
+
         /**/
 
         targetTransform.transform.position = PlayerMovementController.GetPlayerPosition() + positionOffset + rotationOffset + currentOffset;// + offset; // uncomment for fun times
         transform.position = Vector3.Lerp(transform.position, targetTransform.transform.position, turnSmoothing * Time.deltaTime);
 
-        
+
 
     }
 

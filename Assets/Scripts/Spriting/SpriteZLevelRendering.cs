@@ -6,7 +6,7 @@ using UnityEngine;
  * So, the sprites visually act like 3D objects.
  * 
  */
- 
+
 public class SpriteZLevelRendering : MonoBehaviour {
 
     //[HideInInspector]
@@ -15,7 +15,7 @@ public class SpriteZLevelRendering : MonoBehaviour {
 
     private const int IsometricRangePerZUnit = 10;
     private const int LayerDifferenceConstant = 100;
-    
+
     public SpriteRenderer[] spriteChildren;
     public LineRenderer[] lineRendererChildren;
 
@@ -38,14 +38,14 @@ public class SpriteZLevelRendering : MonoBehaviour {
         }
     }
 
-    void Update () {
+    void Update() {
         Vector3 playerPosition = PlayerMovementController.GetPlayerPosition();
         float cameraY = Camera.main.transform.rotation.eulerAngles.y;
 
         Ray playerAxis = new Ray(playerPosition, Quaternion.AngleAxis(cameraY, Vector3.up) * Vector3.right);
         Vector3 crossProduct = Vector3.Cross(playerAxis.direction, movingObject.position - playerAxis.origin);
 
-        float distanceToPlayerAxis = crossProduct.magnitude * Mathf.Sign(crossProduct.y); 
+        float distanceToPlayerAxis = crossProduct.magnitude * Mathf.Sign(crossProduct.y);
         float layeringValue = distanceToPlayerAxis;
 
         for (int i = 0; i < spriteChildren.Length; i++) {

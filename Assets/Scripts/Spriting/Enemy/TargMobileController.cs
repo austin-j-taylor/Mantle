@@ -28,7 +28,6 @@ public class TargMobileController : Enemy {
                 anim.SetTrigger("Killed");
             } else {
                 if (mesh.enabled) {
-                    Debug.Log("setting dest");
                     mesh.SetDestination(player.position);
                     if (GetComponent<Rigidbody>().velocity.magnitude > 1f) {
                         anim.SetBool("IsMoving", true);

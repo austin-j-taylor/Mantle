@@ -64,7 +64,7 @@ public class Projectile : MonoBehaviour {
         scaleUnMesserUpper.transform.rotation = new Quaternion();
 
         transform.parent = scaleUnMesserUpper.transform;
-
+        
         Enemy possibleEnemy = collision.collider.GetComponentInParent<Enemy>();
         if (possibleEnemy != null) {
             possibleEnemy.OnHit(damage);
