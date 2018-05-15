@@ -1,20 +1,24 @@
 ﻿using UnityEngine;
 
 /*
- * Controls the main, third-person camera.
+ * Controls the main, third-person camera and toggling between first and third person.
  */
 
 public class CameraController : MonoBehaviour {
 
     private PlayerMovementController player;
+    private Camera thirdPersonCamera;
+    private Camera firstPersonCamera;
+    private FPVCameraLock cameraLock;
     private Transform cameraTarget;
     private Vector3 positionOffset;
+    private float rotationAngle;
     private float squareRootDOD;
+    private bool firstPerson;
 
     private float moveSmoothing = .05f;
     private int directionOffsetDistance = 10;
     private int degreesPerSecond = 120;
-    public float rotationAngle;
 
     public float Angle {
         get {
@@ -24,18 +28,53 @@ public class CameraController : MonoBehaviour {
             rotationAngle = value;
         }
     }
+    public bool FirstPerson {
+        get {
+            return firstPerson;
+        }
+    }
 
 
     void Start() {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovementController>();
+        thirdPersonCamera = GetComponent<Camera>();
+        firstPersonCamera = player.GetComponentInChildren<Camera>();
+        cameraLock = player.GetComponentInChildren<FPVCameraLock>();
         positionOffset = new Vector3(0, 13, -22);
         squareRootDOD = Mathf.Sqrt(directionOffsetDistance);
         cameraTarget = transform.parent;
         rotationAngle = 0;
+        firstPerson = false;
+        thirdPersonCamera.enabled = true;
+        firstPersonCamera.enabled = false;
+        cameraLock.enabled = false;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     void Update() {
-        if (!player.FirstPerson) {
+        // Toggling between first and third person
+        if (Input.GetKeyDown(KeyCode.G)) {
+            firstPerson = !firstPerson;
+            if (firstPerson) {
+                // changing to first person view. Update player rotation to match camera angle. Make player head invisible.
+                thirdPersonCamera.enabled = false;
+                firstPersonCamera.enabled = true;
+                cameraLock.enabled = true;
+                Cursor.lockState = CursorLockMode.Locked;
+                player.transform.localEulerAngles = new Vector3(0, 30, 0);
+                cameraLock.Direction = new Vector2(rotationAngle, 0);
+            } else {
+                // changing to third person view. Update camera angle to reflect current vieiwing angle. Make player head visible.
+                thirdPersonCamera.enabled = true;
+                firstPersonCamera.enabled = false;
+                cameraLock.enabled = false;
+                Cursor.lockState = CursorLockMode.None;
+                rotationAngle = player.transform.localEulerAngles.y;
+                RotateCameraToAngle(rotationAngle); // skips Lerping
+            }
+        }
+
+        if (!firstPerson) {
             // Set camera rotation
             int rotate = 0;
             if (Input.GetKey(KeyCode.Q)) {
@@ -48,7 +87,6 @@ public class CameraController : MonoBehaviour {
 
             float yLerped = Mathf.LerpAngle(cameraTarget.localEulerAngles.y, rotationAngle, 12 * Time.deltaTime);
             RotateCameraToAngle(yLerped);
-
         }
         // Set camera position
         Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;

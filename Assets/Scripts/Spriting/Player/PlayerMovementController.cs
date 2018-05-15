@@ -30,61 +30,19 @@ public enum Direction : short {
 
 public class PlayerMovementController : MonoBehaviour {
 
-    public Animator animator;
-    private float speed = 3f;
-    private bool firstPV = false;
-
-    private Direction movingDirection = Direction.None;
-    private Camera thirdPersonCamera;
-    private Camera firstPersonCamera;
-    private CameraController cameraController;
-    private FPVCameraLock cameraLock;
+    private Animator animator;
     private Rigidbody rb;
-
+    private CameraController cameraController;
+    private Direction movingDirection = Direction.None;
     private static GameObject thePlayer;
 
-    public bool FirstPerson {
-        get {
-            return firstPV;
-        }
-    }
+    private float speed = 3f;
 
     private void Start() {
-        //Cursor.lockState = CursorLockMode.Locked;
-        thirdPersonCamera = Camera.main;
-        firstPersonCamera = GetComponentInChildren<Camera>();
-        cameraLock = GetComponentInChildren<FPVCameraLock>();
-        cameraController = thirdPersonCamera.GetComponent<CameraController>();
-        thePlayer = gameObject;
+        animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
-
-        thirdPersonCamera.enabled = true;
-        firstPersonCamera.enabled = false;
-        cameraLock.enabled = false;
-        Cursor.lockState = CursorLockMode.None;
-    }
-
-    private void Update() {
-        if (Input.GetKeyDown(KeyCode.G)) {
-            firstPV = !firstPV;
-            if (firstPV) {
-                // changing to first person view. Update player rotation to match camera angle. Make player head invisible.
-                thirdPersonCamera.enabled = false;
-                firstPersonCamera.enabled = true;
-                cameraLock.enabled = true;
-                Cursor.lockState = CursorLockMode.Locked;
-                transform.localEulerAngles = new Vector3(0, 30, 0);
-                cameraLock.Direction = new Vector2(cameraController.Angle, 0);
-            } else {
-                // changing to third person view. Update camera angle to reflect current vieiwing angle. Make player head visible.
-                thirdPersonCamera.enabled = true;
-                firstPersonCamera.enabled = false;
-                cameraLock.enabled = false;
-                Cursor.lockState = CursorLockMode.None;
-                cameraController.Angle = transform.localEulerAngles.y;
-                cameraController.RotateCameraToAngle(cameraController.Angle); // skips Lerping
-            }
-        }
+        cameraController = Camera.main.GetComponent<CameraController>();
+        thePlayer = gameObject;
     }
 
     void FixedUpdate() {
@@ -93,9 +51,7 @@ public class PlayerMovementController : MonoBehaviour {
         Vector3 movement = new Vector3(horiz, 0f, verti);
         movement = movement.normalized * speed * Time.deltaTime;
 
-        if (firstPV) {
-            //transform.Translate(2 * horiz * Time.deltaTime, 0, 2 * verti * Time.deltaTime);
-
+        if (cameraController.FirstPerson) {
             rb.MovePosition(transform.position + transform.TransformDirection(movement));
 
         } else {
