@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Controlls player movement and certain first-person camera control.
+ * 
+ */
+
 /* Walking Directions 
  *        N
  *        3       
@@ -32,16 +37,24 @@ public class PlayerMovementController : MonoBehaviour {
     private Direction movingDirection = Direction.None;
     private Camera thirdPersonCamera;
     private Camera firstPersonCamera;
+    private CameraController cameraController;
     private FPVCameraLock cameraLock;
     private Rigidbody rb;
 
     private static GameObject thePlayer;
+
+    public bool FirstPerson {
+        get {
+            return firstPV;
+        }
+    }
 
     private void Start() {
         //Cursor.lockState = CursorLockMode.Locked;
         thirdPersonCamera = Camera.main;
         firstPersonCamera = GetComponentInChildren<Camera>();
         cameraLock = GetComponentInChildren<FPVCameraLock>();
+        cameraController = thirdPersonCamera.GetComponent<CameraController>();
         thePlayer = gameObject;
         rb = GetComponent<Rigidbody>();
 
@@ -51,23 +64,30 @@ public class PlayerMovementController : MonoBehaviour {
         Cursor.lockState = CursorLockMode.None;
     }
 
-    void FixedUpdate() {
+    private void Update() {
         if (Input.GetKeyDown(KeyCode.G)) {
             firstPV = !firstPV;
             if (firstPV) {
+                // changing to first person view. Update player rotation to match camera angle. Make player head invisible.
                 thirdPersonCamera.enabled = false;
                 firstPersonCamera.enabled = true;
                 cameraLock.enabled = true;
                 Cursor.lockState = CursorLockMode.Locked;
+                transform.localEulerAngles = new Vector3(0, 30, 0);
+                cameraLock.Direction = new Vector2(cameraController.Angle, 0);
             } else {
+                // changing to third person view. Update camera angle to reflect current vieiwing angle. Make player head visible.
                 thirdPersonCamera.enabled = true;
                 firstPersonCamera.enabled = false;
                 cameraLock.enabled = false;
                 Cursor.lockState = CursorLockMode.None;
-
+                cameraController.Angle = transform.localEulerAngles.y;
+                cameraController.RotateCameraToAngle(cameraController.Angle); // skips Lerping
             }
         }
+    }
 
+    void FixedUpdate() {
         float horiz = Input.GetAxisRaw("Horizontal");
         float verti = Input.GetAxisRaw("Vertical");
         Vector3 movement = new Vector3(horiz, 0f, verti);
@@ -79,6 +99,8 @@ public class PlayerMovementController : MonoBehaviour {
             rb.MovePosition(transform.position + transform.TransformDirection(movement));
 
         } else {
+            // makes movement relative to camera
+            movement = Quaternion.Euler(0, cameraController.Angle, 0) * movement;
 
             if (horiz != 0 || verti != 0) {
                 animator.SetBool("IsJustWalking", true);
@@ -121,21 +143,12 @@ public class PlayerMovementController : MonoBehaviour {
 
             Vector3 eulers = transform.eulerAngles;
             if(horiz != 0 || verti != 0) {
-                //transform.eulerAngles = new Vector3(eulers.x, 180f / Mathf.PI * Mathf.Atan2(-verti, horiz) + 90, eulers.z);
-                //transform.eulerAngles = Vector3.Lerp(eulers, new Vector3(eulers.x, 180f / Mathf.PI * Mathf.Atan2(-verti, horiz) + 90, eulers.z), .1f);
-                //transform.LookAt(movement);
                 Quaternion newRotation = Quaternion.LookRotation(movement, Vector3.up);
                 newRotation.x = 0;
                 newRotation.z = 0;
-                //transform.rotation = newRotation;
                 transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, Time.deltaTime * 8);
-
             }
-
-            //rb.MovePosition(transform.position + movement);//transform.TransformDirection(movement));
             transform.Translate(movement, Space.World);
-
-            //transform.rotation = Quaternion.Euler(new Vector3(0f, thirdPersonCamera.transform.rotation.eulerAngles.y, 0f));
         }
     }
 

@@ -1,64 +1,58 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+/*
+ * Controls the main, third-person camera.
+ */
 
 public class CameraController : MonoBehaviour {
 
     private PlayerMovementController player;
-    private Vector3 currentOffset;
-    private Vector3 rotationOffset;
-    private GameObject targetTransform;
+    private Transform cameraTarget;
     private Vector3 positionOffset;
     private float squareRootDOD;
 
-    private float turnSmoothing = 10f;
     private float moveSmoothing = .05f;
     private int directionOffsetDistance = 10;
-    private int degreesRotation = 120;
+    private int degreesPerSecond = 120;
+    public float rotationAngle;
+
+    public float Angle {
+        get {
+            return rotationAngle;
+        }
+        set {
+            rotationAngle = value;
+        }
+    }
 
 
     void Start() {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovementController>();
         positionOffset = new Vector3(0, 13, -22);
         squareRootDOD = Mathf.Sqrt(directionOffsetDistance);
-        targetTransform = new GameObject();
-        currentOffset = new Vector3();
-    }
-
-    private void LateUpdate() {
-        Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
-
-        currentOffset = Vector3.Lerp(currentOffset, player.transform.rotation * offset, moveSmoothing);
-        //transform.LookAt(player.transform.position + currentOffset);
+        cameraTarget = transform.parent;
+        rotationAngle = 0;
     }
 
     void Update() {
-        Vector3 positionBeforeRotation = targetTransform.transform.position;
+        if (!player.FirstPerson) {
+            // Set camera rotation
+            int rotate = 0;
+            if (Input.GetKey(KeyCode.Q)) {
+                rotate = -degreesPerSecond;
+            } else if (Input.GetKey(KeyCode.E)) {
+                rotate = degreesPerSecond;
+            }
 
-        int rotate = 0;
-        //if (Input.GetKey(KeyCode.Q)) {
-        //    rotate = -degreesRotation;
-        //} else if (Input.GetKey(KeyCode.E)) {
-        //    rotate = degreesRotation;
-        //}
+            rotationAngle = (rotationAngle + rotate * Time.deltaTime) % 360;
 
-        targetTransform.transform.RotateAround(PlayerMovementController.GetPlayerPosition(), Vector3.up, rotate * Time.deltaTime);
-        Vector3 deltaRotation = targetTransform.transform.position - positionBeforeRotation;
-        rotationOffset = rotationOffset + deltaRotation;
+            float yLerped = Mathf.LerpAngle(cameraTarget.localEulerAngles.y, rotationAngle, 12 * Time.deltaTime);
+            RotateCameraToAngle(yLerped);
 
-
-        /* currentOffset is applied to position instead of rotation in FixedUpdate until Unity resolves its Japes */
-
+        }
+        // Set camera position
         Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
-        currentOffset = Vector3.Lerp(currentOffset, player.transform.rotation * offset, moveSmoothing);
-
-        /**/
-
-        targetTransform.transform.position = PlayerMovementController.GetPlayerPosition() + positionOffset + rotationOffset + currentOffset;// + offset; // uncomment for fun times
-        transform.position = Vector3.Lerp(transform.position, targetTransform.transform.position, turnSmoothing * Time.deltaTime);
-
-
-
+        cameraTarget.position = Vector3.Lerp(cameraTarget.position, player.transform.position + cameraTarget.localRotation * (offset), 12 * Time.deltaTime);
     }
 
     Vector3 FollowMovement() {
@@ -108,5 +102,8 @@ public class CameraController : MonoBehaviour {
 
         return directionOffset;
 
+    }
+    public void RotateCameraToAngle(float angle) {
+        cameraTarget.localEulerAngles = new Vector3(cameraTarget.localEulerAngles.x, angle, cameraTarget.localEulerAngles.z);
     }
 }

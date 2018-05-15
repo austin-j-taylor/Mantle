@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Controls the first-person camera.
+ */
+
 public class FPVCameraLock : MonoBehaviour {
 
     Vector2 mouseLook;
@@ -10,6 +14,12 @@ public class FPVCameraLock : MonoBehaviour {
     private float smooth = 2f;
 
     GameObject character;
+
+    public Vector2 Direction {
+        set {
+            mouseLook = value;
+        }
+    }
     // Use this for initialization
     void Start() {
         character = transform.parent.gameObject;

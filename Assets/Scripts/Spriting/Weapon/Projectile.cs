@@ -84,6 +84,7 @@ public class Projectile : MonoBehaviour {
 
 
     }
+
     public void SetTailPositionNocked() {
         transform.localPosition = nockedPositionOffset;
         transform.localRotation = Quaternion.Euler(0, -90, 0);
