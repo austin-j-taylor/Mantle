@@ -14,7 +14,7 @@ public class Shooter : MonoBehaviour {
     protected bool isLoading = false;
     protected bool loaded = false;
 
-    private LineRenderer predictedPath;
+    //private LineRenderer predictedPath;
     private Coroutine loadingRoutine;
 
     // constants for physics calculations
@@ -38,7 +38,7 @@ public class Shooter : MonoBehaviour {
     }
 
     protected void Start() {
-        predictedPath = GetComponent<LineRenderer>();
+        //predictedPath = GetComponent<LineRenderer>();
         shooterAnimator = GetComponent<Animator>();
         SetVelocityShortcuts();
     }

@@ -2,29 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TargStationaryController : Enemy {
-
-    private Animator anim;
+public class TargStationaryController : Targ {
 
     new void Start() {
-        anim = GetComponentInChildren<Animator>();
-        health.MaxHealth = 5;
-        health.Health = health.MaxHealth;
-    }
+        base.Start();
 
-    void Update() {
-        if (!isDead) {
-            if (health.Health <= 0) {
-                // die
-
-            } else if (GetComponent<Rigidbody>().velocity.magnitude > 1f) {
-                anim.SetBool("IsMoving", true);
-            }
-        }
-    }
-
-    public override void OnHit(float damage) {
-        base.OnHit(damage);
-
+        health.MaxHealth = 10;
     }
 }

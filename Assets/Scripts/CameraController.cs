@@ -7,16 +7,15 @@
 public class CameraController : MonoBehaviour {
 
     private PlayerMovementController player;
+    private SkinnedMeshRenderer playerHead;
     private Camera thirdPersonCamera;
     private Camera firstPersonCamera;
     private FPVCameraLock cameraLock;
     private Transform cameraTarget;
-    private Vector3 positionOffset;
     private float rotationAngle;
     private float squareRootDOD;
     private bool firstPerson;
-
-    private float moveSmoothing = .05f;
+    
     private int directionOffsetDistance = 10;
     private int degreesPerSecond = 120;
 
@@ -37,12 +36,14 @@ public class CameraController : MonoBehaviour {
 
     void Start() {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovementController>();
+        playerHead = GameObject.FindGameObjectWithTag("PlayerHead").GetComponent<SkinnedMeshRenderer>();
         thirdPersonCamera = GetComponent<Camera>();
         firstPersonCamera = player.GetComponentInChildren<Camera>();
         cameraLock = player.GetComponentInChildren<FPVCameraLock>();
-        positionOffset = new Vector3(0, 13, -22);
         squareRootDOD = Mathf.Sqrt(directionOffsetDistance);
         cameraTarget = transform.parent;
+        transform.position = new Vector3(0, 13, -22);
+        thirdPersonCamera.fieldOfView = 15;
         rotationAngle = 0;
         firstPerson = false;
         thirdPersonCamera.enabled = true;
@@ -63,6 +64,7 @@ public class CameraController : MonoBehaviour {
                 Cursor.lockState = CursorLockMode.Locked;
                 player.transform.localEulerAngles = new Vector3(0, 30, 0);
                 cameraLock.Direction = new Vector2(rotationAngle, 0);
+                playerHead.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
             } else {
                 // changing to third person view. Update camera angle to reflect current vieiwing angle. Make player head visible.
                 thirdPersonCamera.enabled = true;
@@ -71,6 +73,7 @@ public class CameraController : MonoBehaviour {
                 Cursor.lockState = CursorLockMode.None;
                 rotationAngle = player.transform.localEulerAngles.y;
                 RotateCameraToAngle(rotationAngle); // skips Lerping
+                playerHead.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             }
         }
 

@@ -22,7 +22,7 @@ public class Projectile : MonoBehaviour {
         set { inHand = value; }
     }
 
-    private void Start() {
+    protected void Start() {
         nockedPositionOffset = Vector3.zero;
     }
 

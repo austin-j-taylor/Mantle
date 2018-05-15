@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerArmController : MonoBehaviour {
-
-    private PlayerWeaponController player;
+    
     private SpriteZLevelRendering zRenderer;
-    private PlayerBowController bowController;
 
     // Default layer values
     private const int frontRight = 61;
@@ -18,8 +16,6 @@ public class PlayerArmController : MonoBehaviour {
     private const int right = 4;
 
     void Start() {
-        bowController = GetComponent<PlayerBowController>();
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerWeaponController>();
         zRenderer = GetComponent<SpriteZLevelRendering>();
     }
 

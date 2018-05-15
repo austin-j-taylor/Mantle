@@ -22,6 +22,9 @@ public class EnemyHealth : MonoBehaviour {
             return maxHealth;
         }
         set {
+            if(maxHealth == 0) {
+                health = value;
+            }
             maxHealth = value;
             if (maxHealth < 0)
                 maxHealth = 0;
