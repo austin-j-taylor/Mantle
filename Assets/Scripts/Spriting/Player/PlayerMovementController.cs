@@ -38,7 +38,7 @@ public class PlayerMovementController : MonoBehaviour {
 
     private float speed = 3f;
 
-    private void Start() {
+    private void Awake() {
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
         cameraController = Camera.main.GetComponent<CameraController>();

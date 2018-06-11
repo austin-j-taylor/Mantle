@@ -42,38 +42,20 @@ public class CameraController : MonoBehaviour {
         cameraLock = player.GetComponentInChildren<FPVCameraLock>();
         squareRootDOD = Mathf.Sqrt(directionOffsetDistance);
         cameraTarget = transform.parent;
-        transform.position = new Vector3(0, 13, -22);
+        transform.position = new Vector3(0, 5, -22);
+        transform.eulerAngles = new Vector3(8, 0, 0);
         thirdPersonCamera.fieldOfView = 15;
         rotationAngle = 0;
-        firstPerson = false;
-        thirdPersonCamera.enabled = true;
-        firstPersonCamera.enabled = false;
-        cameraLock.enabled = false;
-        Cursor.lockState = CursorLockMode.None;
+        SetFirstPerson();
     }
 
     void Update() {
         // Toggling between first and third person
         if (Input.GetKeyDown(KeyCode.G)) {
-            firstPerson = !firstPerson;
             if (firstPerson) {
-                // changing to first person view. Update player rotation to match camera angle. Make player head invisible.
-                thirdPersonCamera.enabled = false;
-                firstPersonCamera.enabled = true;
-                cameraLock.enabled = true;
-                Cursor.lockState = CursorLockMode.Locked;
-                player.transform.localEulerAngles = new Vector3(0, 30, 0);
-                cameraLock.Direction = new Vector2(rotationAngle, 0);
-                playerHead.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+                SetThirdPerson();
             } else {
-                // changing to third person view. Update camera angle to reflect current vieiwing angle. Make player head visible.
-                thirdPersonCamera.enabled = true;
-                firstPersonCamera.enabled = false;
-                cameraLock.enabled = false;
-                Cursor.lockState = CursorLockMode.None;
-                rotationAngle = player.transform.localEulerAngles.y;
-                RotateCameraToAngle(rotationAngle); // skips Lerping
-                playerHead.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                SetFirstPerson();
             }
         }
 
@@ -94,6 +76,29 @@ public class CameraController : MonoBehaviour {
         // Set camera position
         Vector3 offset = Input.GetKey(KeyCode.Space) ? FollowMouse() : Vector3.zero;
         cameraTarget.position = Vector3.Lerp(cameraTarget.position, player.transform.position + cameraTarget.localRotation * (offset), 12 * Time.deltaTime);
+    }
+
+    private void SetFirstPerson() {
+        // changing to first person view. Update player rotation to match camera angle. Make player head invisible.
+        firstPerson = true;
+        thirdPersonCamera.enabled = false;
+        firstPersonCamera.enabled = true;
+        cameraLock.enabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        cameraLock.Direction = new Vector2(rotationAngle, 0);
+        playerHead.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+    }
+
+    private void SetThirdPerson() {
+        // changing to third person view. Update camera angle to reflect current vieiwing angle. Make player head visible.
+        firstPerson = false;
+        thirdPersonCamera.enabled = true;
+        firstPersonCamera.enabled = false;
+        cameraLock.enabled = false;
+        Cursor.lockState = CursorLockMode.None;
+        rotationAngle = player.transform.localEulerAngles.y;
+        RotateCameraToAngle(rotationAngle); // skips Lerping
+        playerHead.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
     }
 
     Vector3 FollowMovement() {

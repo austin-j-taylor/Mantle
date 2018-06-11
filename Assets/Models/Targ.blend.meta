@@ -19,6 +19,7 @@ ModelImporter:
     400010: //RootNode
     2100000: None__Targ_Stand_UV_tif
     2100002: None__Targ_UV_tif
+    2100004: Material__Targ_UV_tif
     4300000: Cube
     4300002: Cylinder
     7400000: Default Take
